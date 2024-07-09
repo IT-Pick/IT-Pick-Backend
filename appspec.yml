@@ -1,0 +1,16 @@
+version: 0.0
+os: linux
+
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+files:
+  - source: /
+    destination: /home/ubuntu/itpick
+permissions:
+  - object: /home/ubuntu/itpick
+    owner: ubuntu
+    group: ubuntu
+    mode: 755
