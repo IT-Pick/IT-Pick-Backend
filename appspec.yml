@@ -8,9 +8,9 @@ spring:
     add-mappings: false
 files:
   - source: /
-    destination: /home/ubuntu/itpick
+    destination: /home/ubuntu//IT-Pick-Backend
 permissions:
-  - object: /home/ubuntu/itpick
+  - object: /home/ubuntu//IT-Pick-Backend
     owner: ubuntu
     group: ubuntu
     mode: 755
