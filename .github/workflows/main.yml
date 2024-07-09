@@ -7,6 +7,12 @@ on:
     branches: [ "dev" ]
     
   workflow_dispatch:
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET_NAME: itpick-cicd-bucket
+  PROJECT_NAME: IT-Pick-Backend
+  CODE_DEPLOY_APPLICATION_NAME: itpick_cicd
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: itpick_instance
 
 
 jobs:
@@ -36,3 +42,23 @@ jobs:
         uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5
         with:
           arguments: clean build -x test
+          
+      # AWS 인증
+      - name: AWS configure credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      # 빌드 결과물 S3 버킷에 업로드
+      - name: upload to AWS S3
+        run: aws s3 sync --delete --region $AWS_REGION ./build s3://$S3_BUCKET_NAME
+
+      - name: deploy with AWS codeDeploy
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+            --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip \
