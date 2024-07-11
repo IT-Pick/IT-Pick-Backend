@@ -1,7 +1,7 @@
 package store.itpick.backend.config;
 
-import kuit3.backend.common.argument_resolver.JwtAuthHandlerArgumentResolver;
-import kuit3.backend.common.interceptor.JwtAuthInterceptor;
+import store.itpick.backend.common.argument_resolver.JwtAuthHandlerArgumentResolver;
+import store.itpick.backend.common.interceptor.JwtAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
