@@ -1,7 +1,7 @@
 package store.itpick.backend.common.response;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import kuit3.backend.common.response.status.ResponseStatus;
+import store.itpick.backend.common.response.status.ResponseStatus;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

@@ -1,0 +1,108 @@
+spring:
+  profiles:
+    group:
+      "local": "localDB, devPort, secret, web-mvc"
+      "dev": "devDB, devPort, secret, web-mvc"
+      "prod": "prodDB, prodPort, secret, web-mvc"
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "localDB"
+
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    dbcp2:
+      validation-query: select 1
+  sql:
+    init:
+      platform: mysql
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "devDB"
+
+  datasource:
+    url: ${DATASOURCE_URL_DEV}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    dbcp2:
+      validation-query: select 1
+  sql:
+    init:
+      platform: mysql
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "prodDB"
+
+  datasource:
+    url: ${DATASOURCE_URL_PROD}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    dbcp2:
+      validation-query: select 1
+  sql:
+    init:
+      platform: mysql
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "devPort"
+
+server:
+  port: 9000
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "prodPort"
+
+server:
+  port: 9001
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "secret"
+
+secret:
+  jwt-secret-key: ${JWT_SECRET_KEY}
+  jwt-expired-in: ${JWT_EXPIRED_IN}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "web-mvc"
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+  web:
+    resources:
+      add-mappings: false
+
+  messages:
+    basename: errors
