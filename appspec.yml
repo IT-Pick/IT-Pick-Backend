@@ -9,6 +9,7 @@ spring:
 files:
   - source: /
     destination: /home/ubuntu/IT-Pick-Backend
+file_exists_behavior: OVERWRITE
 permissions:
   - object: /home/ubuntu/IT-Pick-Backend
     owner: ubuntu
