@@ -2,8 +2,28 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.1'
 	id 'io.spring.dependency-management' version '1.1.5'
+	id 'com.google.cloud.tools.jib' version '3.3.1'
 }
 
+
+jib {
+	to {
+		image = "sanha1998/text-me-docker-repo"
+	}
+	from {
+		image = "eclipse-temurin:11-jre"
+	}
+	container {
+		jvmFlags = ["-Xms128m", "-Xmx128m"]
+		environment = [
+				'DATASOURCE_URL': System.getenv('DATASOURCE_URL'),
+				'DATASOURCE_USERNAME': System.getenv('DATASOURCE_USERNAME'),
+				'DATASOURCE_PASSWORD': System.getenv('DATASOURCE_PASSWORD'),
+				'JWT_SECRET_KEY': System.getenv('JWT_SECRET_KEY'),
+				'JWT_EXPIRED_IN': System.getenv('JWT_EXPIRED_IN')
+		]
+	}
+}
 group = 'store.itpick'
 version = '0.0.1-SNAPSHOT'
 
