@@ -6,14 +6,6 @@ on:
   pull_request:
     branches: [ "dev" ]
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Which environment to deploy to'
-        required: true
-        default: 'production'
-        options:
-          - production
-          - test
 env:
   AWS_REGION: ap-northeast-2
   S3_BUCKET_NAME: itpick-cicd-bucket
