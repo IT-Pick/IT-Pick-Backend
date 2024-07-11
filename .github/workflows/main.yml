@@ -77,7 +77,5 @@ jobs:
           spring.datasource.password: ${{ secrets.DATASOURCE_PASSWORD }} 
           secret.jwt-secret-key: ${{ secrets.JWT_SECRET_KEY }}
           secret.jwt-expired-in: ${{ secrets.JWT_EXPIRED_IN }}
-          naver.map.client.id: ${{ secrets.NAVER_CLIENT_ID }}
-          naver.map.client.secret: ${{ secrets.NAVER_CLIENT_SECRET }}
       - name: Test AWS credentials
         run: aws s3 ls
