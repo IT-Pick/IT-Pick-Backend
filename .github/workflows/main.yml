@@ -66,13 +66,13 @@ jobs:
             --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
             --s3-location bucket=${{ env.S3_BUCKET_NAME }},key=${{ env.PROJECT_NAME }}/$GITHUB_SHA.zip,bundleType=zip
            
-        - name: Set environment variables
-          run: |
-            echo "DATASOURCE_URL=${{ secrets.DATASOURCE_URL }}" >> $GITHUB_ENV
-            echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}" >> $GITHUB_ENV
-            echo "DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
-            echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
-            echo "JWT_EXPIRED_IN=${{ secrets.JWT_EXPIRED_IN }}" >> $GITHUB_ENV
+      - name: Set environment variables
+        run: |
+          echo "DATASOURCE_URL=${{ secrets.DATASOURCE_URL }}" >> $GITHUB_ENV
+          echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}" >> $GITHUB_ENV
+          echo "DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
+          echo "JWT_EXPIRED_IN=${{ secrets.JWT_EXPIRED_IN }}" >> $GITHUB_ENV
 
       - name: Test AWS credentials
         run: aws s3 ls
