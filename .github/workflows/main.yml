@@ -20,6 +20,7 @@ env:
   PROJECT_NAME: IT-Pick-Backend
   CODE_DEPLOY_APPLICATION_NAME: itpick_cicd
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: itpick_instance
+  ENV_PATH: .env
 
 
 jobs:
@@ -74,25 +75,15 @@ jobs:
             --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
             --s3-location bucket=${{ env.S3_BUCKET_NAME }},key=${{ env.PROJECT_NAME }}/$GITHUB_SHA.zip,bundleType=zip
       - name: Set environment variables and start application
-        env:
-          SSH_PRIVATE_KEY_PATH: ${{ secrets.SSH_PRIVATE_KEY_PATH }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
-          DATASOURCE_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
-          DATASOURCE_URL: ${{ secrets.DATASOURCE_URL }}
-          DATASOURCE_USERNAME: ${{ secrets.DATASOURCE_USERNAME }}
-          JWT_EXPIRED_IN: ${{ secrets.JWT_EXPIRED_IN }}
-          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-          SPRING_PROFILE_ACTIVE: ${{ secrets.SPRING_PROFILE_ACTIVE }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH ubuntu@$SERVER_IP << 'EOF'
-            export DATASOURCE_PASSWORD=$DATASOURCE_PASSWORD
-            export DATASOURCE_URL=$DATASOURCE_URL
-            export DATASOURCE_USERNAME=$DATASOURCE_USERNAME
-            export JWT_EXPIRED_IN=$JWT_EXPIRED_IN
-            export JWT_SECRET_KEY=$JWT_SECRET_KEY
-            export SPRING_PROFILE_ACTIVE=$SPRING_PROFILE_ACTIVE
-            bash /home/ubuntu/IT-Pick-Backend/deploy.sh
-          EOF
+          touch ${{ env.ENV_PATH }}
+          echo DOMAIN_FIR=${{ secrets.DOMAIN_FIR }} >> ${{ env.ENV_PATH }}
+          echo DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }} >> ${{ env.ENV_PATH }}
+          echo DATASOURCE_URL=${{ secrets.DATASOURCE_URL }} >> ${{ env.ENV_PATH }}
+          echo DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }} >> ${{ env.ENV_PATH }}
+          echo JWT_EXPIRED_IN=${{ secrets.JWT_EXPIRED_IN }} >> ${{ env.ENV_PATH }}
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> ${{ env.ENV_PATH }}
+          echo SPRING_PROFILE_ACTIVE=${{ secrets.SPRING_PROFILE_ACTIVE }} >> ${{ env.ENV_PATH }}
           
       - name: Test AWS credentials
         run: aws s3 ls
