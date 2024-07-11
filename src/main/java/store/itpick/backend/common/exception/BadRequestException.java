@@ -1,6 +1,6 @@
 package store.itpick.backend.common.exception;
 
-import kuit3.backend.common.response.status.ResponseStatus;
+import store.itpick.backend.common.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter

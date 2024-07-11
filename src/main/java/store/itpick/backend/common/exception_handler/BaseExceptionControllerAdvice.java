@@ -1,9 +1,9 @@
 package store.itpick.backend.common.exception_handler;
 
 import jakarta.validation.ConstraintViolationException;
-import kuit3.backend.common.exception.BadRequestException;
-import kuit3.backend.common.exception.InternalServerErrorException;
-import kuit3.backend.common.response.BaseErrorResponse;
+import store.itpick.backend.common.exception.BadRequestException;
+import store.itpick.backend.common.exception.InternalServerErrorException;
+import store.itpick.backend.common.response.BaseErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import static kuit3.backend.common.response.status.BaseExceptionResponseStatus.*;
+import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
 
 @Slf4j
 @RestControllerAdvice

@@ -2,10 +2,10 @@ package store.itpick.backend.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import kuit3.backend.common.response.status.ResponseStatus;
+import store.itpick.backend.common.response.status.ResponseStatus;
 import lombok.Getter;
 
-import static kuit3.backend.common.response.status.BaseExceptionResponseStatus.SUCCESS;
+import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.SUCCESS;
 
 @Getter
 @JsonPropertyOrder({"code", "status", "message", "result"})

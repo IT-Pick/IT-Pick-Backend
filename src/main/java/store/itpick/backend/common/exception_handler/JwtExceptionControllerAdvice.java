@@ -1,9 +1,9 @@
 package store.itpick.backend.common.exception_handler;
 
 import jakarta.annotation.Priority;
-import kuit3.backend.common.exception.jwt.bad_request.JwtBadRequestException;
-import kuit3.backend.common.exception.jwt.unauthorized.JwtUnauthorizedTokenException;
-import kuit3.backend.common.response.BaseErrorResponse;
+import store.itpick.backend.common.exception.jwt.bad_request.JwtBadRequestException;
+import store.itpick.backend.common.exception.jwt.unauthorized.JwtUnauthorizedTokenException;
+import store.itpick.backend.common.response.BaseErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
