@@ -20,7 +20,7 @@ env:
   PROJECT_NAME: IT-Pick-Backend
   CODE_DEPLOY_APPLICATION_NAME: itpick_cicd
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: itpick_instance
-  ENV_PATH: .env
+  RESOURCE_PATH: ${{ secrets.RESOURCE_PATH }}
 
 
 jobs:
@@ -74,16 +74,18 @@ jobs:
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
             --s3-location bucket=${{ env.S3_BUCKET_NAME }},key=${{ env.PROJECT_NAME }}/$GITHUB_SHA.zip,bundleType=zip
-      - name: Set environment variables and start application
-        run: |
-          touch ${{ env.ENV_PATH }}
-          echo DOMAIN_FIR=${{ secrets.DOMAIN_FIR }} >> ${{ env.ENV_PATH }}
-          echo DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }} >> ${{ env.ENV_PATH }}
-          echo DATASOURCE_URL=${{ secrets.DATASOURCE_URL }} >> ${{ env.ENV_PATH }}
-          echo DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }} >> ${{ env.ENV_PATH }}
-          echo JWT_EXPIRED_IN=${{ secrets.JWT_EXPIRED_IN }} >> ${{ env.ENV_PATH }}
-          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> ${{ env.ENV_PATH }}
-          echo SPRING_PROFILE_ACTIVE=${{ secrets.SPRING_PROFILE_ACTIVE }} >> ${{ env.ENV_PATH }}
-          
+      - name: Set yml file 
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{ secrets.RESOURCE_PATH }} 
+        env:
+          spring.profile.active: local
+          spring.datasource.url: ${{ secrets.DATASOURCE_URL }} 
+          spring.datasource.username: ${{ secrets.DATASOURCE_USERNAME }} 
+          spring.datasource.password: ${{ secrets.DATASOURCE_PASSWORD }} 
+          secret.jwt-secret-key: ${{ secrets.JWT_SECRET_KEY }}
+          secret.jwt-expired-in: ${{ secrets.JWT_EXPIRED_IN }}
+          naver.map.client.id: ${{ secrets.NAVER_CLIENT_ID }}
+          naver.map.client.secret: ${{ secrets.NAVER_CLIENT_SECRET }}
       - name: Test AWS credentials
         run: aws s3 ls
