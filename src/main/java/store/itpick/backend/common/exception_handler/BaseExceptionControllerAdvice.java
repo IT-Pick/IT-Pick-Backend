@@ -1,6 +1,6 @@
 package store.itpick.backend.common.exception_handler;
 
-import jakarta.validation.ConstraintViolationException;
+// import jakarta.validation.ConstraintViolationException;
 import store.itpick.backend.common.exception.BadRequestException;
 import store.itpick.backend.common.exception.InternalServerErrorException;
 import store.itpick.backend.common.response.BaseErrorResponse;
@@ -42,12 +42,12 @@ public class BaseExceptionControllerAdvice {
         return new BaseErrorResponse(METHOD_NOT_ALLOWED);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ConstraintViolationException.class)
-    public BaseErrorResponse handle_ConstraintViolationException(ConstraintViolationException e) {
-        log.error("[handle_ConstraintViolationException]", e);
-        return new BaseErrorResponse(BAD_REQUEST, e.getMessage());
-    }
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    @ExceptionHandler(ConstraintViolationException.class)
+//    public BaseErrorResponse handle_ConstraintViolationException(ConstraintViolationException e) {
+//        log.error("[handle_ConstraintViolationException]", e);
+//        return new BaseErrorResponse(BAD_REQUEST, e.getMessage());
+//    }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(InternalServerErrorException.class)
