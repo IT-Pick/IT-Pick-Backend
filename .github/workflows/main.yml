@@ -65,7 +65,7 @@ jobs:
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
             --s3-location bucket=${{ env.S3_BUCKET_NAME }},key=${{ env.PROJECT_NAME }}/$GITHUB_SHA.zip,bundleType=zip
-
+           
         - name: Set environment variables
           run: |
             echo "DATASOURCE_URL=${{ secrets.DATASOURCE_URL }}" >> $GITHUB_ENV
