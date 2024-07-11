@@ -5,8 +5,15 @@ on:
     branches: [ "dev" ]
   pull_request:
     branches: [ "dev" ]
-
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Which environment to deploy to'
+        required: true
+        default: 'production'
+        options:
+          - production
+          - test
 env:
   AWS_REGION: ap-northeast-2
   S3_BUCKET_NAME: itpick-cicd-bucket
@@ -66,6 +73,23 @@ jobs:
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
             --s3-location bucket=${{ env.S3_BUCKET_NAME }},key=${{ env.PROJECT_NAME }}/$GITHUB_SHA.zip,bundleType=zip
-
+      - name: Set environment variables and start application
+        run: |
+          ENVIRONMENT=${{ github.event.inputs.environment || 'production' }}
+          ssh -o StrictHostKeyChecking=no -i /path/to/your-key.pem ubuntu@your-server-ip << 'EOF'
+            echo "Setting environment variables for \$ENVIRONMENT on the server..."
+            if [ "\$ENVIRONMENT" == "production" ]; then
+              export DOMAIN_FIR=${{ secrets.DOMAIN_FIR_PROD }}
+              export SOCKET_PORT=${{ secrets.SOCKET_PORT_PROD }}
+            elif [ "\$ENVIRONMENT" == "staging" ]; then
+              export DOMAIN_FIR=${{ secrets.DOMAIN_FIR_STAG }}
+              export SOCKET_PORT=${{ secrets.SOCKET_PORT_STAG }}
+            elif [ "\$ENVIRONMENT" == "development" ]; then
+              export DOMAIN_FIR=${{ secrets.DOMAIN_FIR_DEV }}
+              export SOCKET_PORT=${{ secrets.SOCKET_PORT_DEV }}
+            fi
+            bash /home/ubuntu/IT-Pick-Backend/deploy.sh
+          EOF
+          
       - name: Test AWS credentials
         run: aws s3 ls
