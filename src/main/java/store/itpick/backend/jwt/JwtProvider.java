@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
-
+//test
 @Slf4j
 @Component
 public class JwtProvider {
