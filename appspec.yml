@@ -8,9 +8,15 @@ spring:
     add-mappings: false
 files:
   - source: /
-    destination: /home/ubuntu//IT-Pick-Backend
+    destination: /home/ubuntu/IT-Pick-Backend
+file_exists_behavior: OVERWRITE
 permissions:
-  - object: /home/ubuntu//IT-Pick-Backend
+  - object: /home/ubuntu/IT-Pick-Backend
     owner: ubuntu
     group: ubuntu
     mode: 755
+hooks:
+  AfterInstall:
+    - location: scripts/deploy.sh
+      timeout: 60
+      runas: ubuntu
