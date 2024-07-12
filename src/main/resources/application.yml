@@ -67,7 +67,7 @@ spring:
       on-profile: "devPort"
 
 server:
-  port: 9000
+  port: 8080
 
 ---
 
@@ -77,7 +77,7 @@ spring:
       on-profile: "prodPort"
 
 server:
-  port: 9001
+  port: 8081
 
 ---
 
