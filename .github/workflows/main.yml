@@ -3,8 +3,6 @@ name: Build and Deploy to EC2
 on:
   push:
     branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
   workflow_dispatch:
 env:
   AWS_REGION: ap-northeast-2
