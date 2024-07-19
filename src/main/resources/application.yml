@@ -5,6 +5,11 @@ spring:
       "dev": "devDB, devPort, secret, web-mvc"
       "prod": "prodDB, prodPort, secret, web-mvc"
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 ---
 
 spring:
@@ -106,3 +111,4 @@ spring:
 
   messages:
     basename: errors
+
