@@ -48,14 +48,15 @@ dependencies {
 	// aop
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
-	//redis
+	// redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-	//jsoup
+	// jsoup
 	implementation 'org.jsoup:jsoup:1.15.3'
 
-
-
+	// selenium
+	implementation 'org.seleniumhq.selenium:selenium-java:4.19.1'
+	implementation 'org.seleniumhq.selenium:selenium-devtools-v121:4.19.1'
 }
 
 tasks.named('test') {
