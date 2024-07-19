@@ -47,6 +47,15 @@ dependencies {
 
 	// aop
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//jsoup
+	implementation 'org.jsoup:jsoup:1.15.3'
+
+
+
 }
 
 tasks.named('test') {
