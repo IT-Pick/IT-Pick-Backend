@@ -19,6 +19,9 @@ public class TestController {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    @Autowired
+    private Selenium selenium;
+
     @GetMapping("/test-redis")
     public String testRedis() {
         // Redis에 값을 저장하고 다시 가져와서 확인
@@ -37,12 +40,10 @@ public class TestController {
 
     @GetMapping("/test/selenium")
     public String seleniumTest() {
-        Selenium sel = new Selenium();
-
         String url = "https://trends.google.com/trends/trendingsearches/daily?geo=KR&hl=ko";
         String cssSelector = ".summary-text > a";
 
-        return sel.useDriver(url, cssSelector);
+        return selenium.useDriver(url, cssSelector);
     }
 
     @GetMapping("/*")
