@@ -13,10 +13,10 @@ import static store.itpick.backend.common.response.status.BaseExceptionResponseS
 
 @Slf4j
 @Priority(0)
-@RestControllerAdvice
+@RestControllerAdvice //모든 컨트롤러에서 발생하는 예외를 전역적으로 처리
 public class UserExceptionControllerAdvice {
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.BAD_REQUEST) //해당 메서드의 예외 발생시 보낼
     @ExceptionHandler(UserException.class)
     public BaseErrorResponse handle_UserException(UserException e){
         log.error("[handle_UserException]", e);

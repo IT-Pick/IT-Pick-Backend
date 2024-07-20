@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.security.Timestamp;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -17,7 +18,7 @@ import java.security.Timestamp;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false)
     private String email;
@@ -43,20 +44,12 @@ public class User {
     @Column
     private String refresh_token;
 
-    @Column(nullable = false)
+    @Column
     private String status;
 
-    @Column(nullable = false)
+    @Column
     private Timestamp create_at;
 
-    @Column(nullable = false)
+    @Column
     private Timestamp update_at;
-
-    public Long getId(){
-        return id;
-    }
-
-    public Long getPassword(){
-        return id;
-    }
 }
