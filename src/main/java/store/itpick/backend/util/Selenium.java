@@ -1,32 +1,34 @@
 package store.itpick.backend.util;
 
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
 public class Selenium {
 
-    private WebDriver driver;
-    public static String WEB_DRIVER_ID = "webdriver.chrome.driver"; // Properties 설정
-    public static String WEB_DRIVER_PATH = "C:/chromedriver.exe"; // WebDriver 경로
-//    public static String WEB_DRIVER_PATH = "/Users/minseok/Documents/3rd/chromedriver"; // WebDriver 경로
+    private static WebDriver driver;
+    private final static String WEB_DRIVER_ID = "webdriver.chrome.driver"; // Properties 설정
 
+    @Value("${web-driver.path}")
+    private String WEB_DRIVER_PATH;
 
-    // 생성자
-    public Selenium() {
-        chrome();
-    }
-
-    // ChromeDriver 연결
+    // ChromeDriver 연결 (WEB_DRIVER_PATH 값 주입되고 사용해야 하므로 PostConstruct)
+    @PostConstruct
     private void chrome() {
+
         // 웹드라이버 ID 및 경로 설정
         System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
 
