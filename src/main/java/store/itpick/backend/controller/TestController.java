@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import store.itpick.backend.util.Selenium;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 public class TestController {
@@ -26,34 +27,22 @@ public class TestController {
         return value;
     }
 
-    @GetMapping("/test20")
-    void testJsoup20() throws IOException {
+    @GetMapping("/test/jsoup")
+    void jsoupTest() throws IOException {
         String homeUrl = "https://news.sbs.co.kr/news/newsMain.do";
         Document doc = Jsoup.connect(homeUrl).get();
         Elements elements = doc.select("li > a > p > strong");
         System.out.println(elements);
     }
 
-    @GetMapping("/test21")
-    void testJsoup21() throws IOException {
-        String homeUrl = "https://trends.google.com/trends/trendingsearches/daily?geo=KR&hl=ko";
-        Connection.Response response = Jsoup.connect(homeUrl).method(Connection.Method.GET).execute();
-        Document doc = response.parse();
-        System.out.println(doc.html());
-    }
-
-    @GetMapping("/test22")
-    public String test() {
-
-        //JsoupFun um = new JsoupFun();
-
+    @GetMapping("/test/selenium")
+    public String seleniumTest() {
         Selenium sel = new Selenium();
 
         String url = "https://trends.google.com/trends/trendingsearches/daily?geo=KR&hl=ko";
+        String cssSelector = ".summary-text > a";
 
-        sel.useDriver(url);
-
-        return "main";
+        return sel.useDriver(url, cssSelector);
     }
 
     @GetMapping("/*")
