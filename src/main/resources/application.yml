@@ -22,6 +22,16 @@ spring:
   sql:
     init:
       platform: mysql
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  h2:
+    console:
+      enabled: true
 
 ---
 
@@ -40,6 +50,13 @@ spring:
   sql:
     init:
       platform: mysql
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
 
 ---
 
@@ -58,6 +75,13 @@ spring:
   sql:
     init:
       platform: mysql
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
 
 ---
 
