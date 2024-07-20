@@ -1,39 +1,64 @@
 package store.itpick.backend.service;
 
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import store.itpick.backend.common.exception.UserException;
+import store.itpick.backend.common.response.status.BaseExceptionResponseStatus;
+import store.itpick.backend.dao.UserDao;
 import store.itpick.backend.dto.user.user.PostUserRequest;
+import store.itpick.backend.dto.user.user.PostUserResponse;
 import store.itpick.backend.model.User;
-import store.itpick.backend.repository.UserRepository;
+
+
+import java.util.List;
 
 @Service
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
-    private BCryptPasswordEncoder passwordEncoder;
-    private  UserRepository userRepository;
 
-    public UserService(UserRepository userRepository){
-        this.userRepository = userRepository;
-        this.passwordEncoder = new BCryptPasswordEncoder(); // passwordEncoder 초기화
-    }
+    private final UserDao userDao;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public PostUserRequest createUser(PostUserRequest postUserRequest){
-        String password = postUserRequest.getPassword();
-        String encodedPassword = passwordEncoder.encode(password);
+    @Transactional
+    public PostUserResponse signUp(PostUserRequest postUserRequest) {
+        // Validate email and nickname
+        validateEmail(postUserRequest.getEmail());
+        if (postUserRequest.getNickname() != null) {
+            validateNickname(postUserRequest.getNickname());
+        }
+
+        // Encrypt password
+        String encodedPassword = passwordEncoder.encode(postUserRequest.getPassword());
         postUserRequest.setPassword(encodedPassword);
 
+        // Create user
         User user = User.builder()
                 .email(postUserRequest.getEmail())
-                .password(postUserRequest.getPassword())
+                .password(encodedPassword)
                 .nickname(postUserRequest.getNickname())
                 .birth_date(postUserRequest.getBirth_date())
+                .status("active")
                 .build();
 
-        user = userRepository.save(user);
+        user = userDao.save(user);
 
-        return PostUserRequest.builder()
-                .nickname(user.getNickname())
-                .build();
+        // Generate JWT token (you may need to implement this)
+        String jwt = ""; // Replace with actual JWT generation logic
+
+        return new PostUserResponse(user.getId(), jwt);
+    }
+
+    private void validateEmail(String email) {
+        if (userDao.existsByEmailAndStatusIn(email, List.of("active", "dormant"))) {
+            throw new UserException(BaseExceptionResponseStatus.DUPLICATE_EMAIL);
+        }
+    }
+
+    private void validateNickname(String nickname) {
+        if (userDao.existsByNicknameAndStatusIn(nickname, List.of("active", "dormant"))) {
+            throw new UserException(BaseExceptionResponseStatus.DUPLICATE_NICKNAME);
+        }
     }
 }
