@@ -1,9 +1,9 @@
 spring:
   profiles:
     group:
-      "local": "localDB, devPort, secret, web-mvc"
-      "dev": "devDB, devPort, secret, web-mvc"
-      "prod": "prodDB, prodPort, secret, web-mvc"
+      "local": "localDB, devPort, secret, web-mvc, web-driver"
+      "dev": "devDB, devPort, secret, web-mvc, web-driver"
+      "prod": "prodDB, prodPort, secret, web-mvc, web-driver"
 
   data:
     redis:
@@ -111,4 +111,14 @@ spring:
 
   messages:
     basename: errors
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "web-driver"
+
+web-driver:
+  path: ${WEB_DRIVER_PATH}
 
