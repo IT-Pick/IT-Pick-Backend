@@ -18,8 +18,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 public class Selenium {
-
-    private static WebDriver driver;
+    private WebDriver driver;
     private final static String WEB_DRIVER_ID = "webdriver.chrome.driver"; // Properties 설정
 
     @Value("${web-driver.path}")
