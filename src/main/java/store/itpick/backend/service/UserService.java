@@ -14,6 +14,7 @@ import store.itpick.backend.model.User;
 
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -34,13 +35,7 @@ public class UserService {
         postUserRequest.setPassword(encodedPassword);
 
         // Create user
-        User user = User.builder()
-                .email(postUserRequest.getEmail())
-                .password(encodedPassword)
-                .nickname(postUserRequest.getNickname())
-                .birth_date(postUserRequest.getBirth_date())
-                .status("active")
-                .build();
+        User user = User.builder().email(postUserRequest.getEmail()).password(encodedPassword).nickname(postUserRequest.getNickname()).birth_date(postUserRequest.getBirth_date()).status("active").build();
 
         user = userDao.save(user);
 
@@ -60,5 +55,9 @@ public class UserService {
         if (userDao.existsByNicknameAndStatusIn(nickname, List.of("active", "dormant"))) {
             throw new UserException(BaseExceptionResponseStatus.DUPLICATE_NICKNAME);
         }
+    }
+
+    public void modifyUserStatus_deleted(long userId) {
+        userDao.modifyUserStatus_deleted(userId);
     }
 }

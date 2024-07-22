@@ -4,6 +4,8 @@ package store.itpick.backend.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import store.itpick.backend.common.exception.UserException;
+import store.itpick.backend.common.response.status.BaseExceptionResponseStatus;
 import store.itpick.backend.model.User;
 import store.itpick.backend.repository.UserRepository;
 
@@ -34,5 +36,17 @@ public class UserDao {
 
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    public int modifyUserStatus_deleted(long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setStatus("deleted");
+            userRepository.save(user);
+        } else {
+            throw new UserException(BaseExceptionResponseStatus.USER_NOT_FOUND);
+        }
+        return 0;
     }
 }

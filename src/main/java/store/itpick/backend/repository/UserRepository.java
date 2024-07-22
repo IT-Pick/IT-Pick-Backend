@@ -6,10 +6,9 @@ import store.itpick.backend.model.User;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailAndStatusIn(String email, List<String> status);
 
     Optional<User> findByNicknameAndStatusIn(String nickname,List<String> status);

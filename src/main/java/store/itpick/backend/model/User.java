@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.security.Timestamp;
-import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -18,7 +17,8 @@ import java.util.UUID;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    @Column(name = "user_id")
+    private long id;
 
     @Column(nullable = false)
     private String email;
@@ -27,13 +27,14 @@ public class User {
     private String password;
 
     @Column(nullable = false)
+
     private String nickname;
 
     @Column(nullable = false)
     private Long birth_date;
 
     @Column
-    private Boolean alect_setting;
+    private Boolean alert_setting;
 
     @Column
     private String reference_code;
