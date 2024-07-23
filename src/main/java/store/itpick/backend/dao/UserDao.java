@@ -18,18 +18,11 @@ import java.util.Optional;
 public class UserDao {
     private final UserRepository userRepository;
 
-    public Optional<User> findByEmailAndStatusIn(String email, List<String> status) {
-        return userRepository.findByEmailAndStatusIn(email, status);
-    }
-
-    public Optional<User> findByNicknameAndStatusIn(String nickname, List<String> status) {
-        return userRepository.findByNicknameAndStatusIn(nickname, status);
-    }
-
+    // 주어진 이메일, 상태목록을 기반으로 사용자 존재 유무 확인
     public boolean existsByEmailAndStatusIn(String email, List<String> status) {
         return userRepository.existsByEmailAndStatusIn(email, status);
     }
-
+    // 주어진 닉네임, 상태목록을 기반으로 사용자 존재 확인
     public boolean existsByNicknameAndStatusIn(String nickname, List<String> status) {
         return userRepository.existsByNicknameAndStatusIn(nickname, status);
     }

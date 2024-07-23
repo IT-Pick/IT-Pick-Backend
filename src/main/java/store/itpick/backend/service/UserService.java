@@ -24,7 +24,7 @@ public class UserService {
 
     @Transactional
     public PostUserResponse signUp(PostUserRequest postUserRequest) {
-        // Validate email and nickname
+        // email, name 유효성 검사
         validateEmail(postUserRequest.getEmail());
         if (postUserRequest.getNickname() != null) {
             validateNickname(postUserRequest.getNickname());
@@ -39,8 +39,8 @@ public class UserService {
 
         user = userDao.save(user);
 
-        // Generate JWT token (you may need to implement this)
-        String jwt = ""; // Replace with actual JWT generation logic
+        // 회원가입에서 jwt 생성 시 여기에 로직 포함시키기
+        String jwt = "";
 
         return new PostUserResponse(user.getId(), jwt);
     }

@@ -5,13 +5,9 @@ import org.springframework.stereotype.Repository;
 import store.itpick.backend.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmailAndStatusIn(String email, List<String> status);
-
-    Optional<User> findByNicknameAndStatusIn(String nickname,List<String> status);
 
     boolean existsByEmailAndStatusIn(String email, List<String> status);
 
