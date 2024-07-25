@@ -1,12 +1,10 @@
 package store.itpick.backend.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -14,43 +12,49 @@ import java.security.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private long id;
+    private Long userId;
 
-    @Column(nullable = false)
+    @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false, length = 200)
     private String password;
 
-    @Column(nullable = false)
-
+    @Column(name = "nickname", nullable = false, length = 20)
     private String nickname;
 
-    @Column(nullable = false)
-    private Long birth_date;
+    @Column(name = "birth_date", nullable = false, length = 20)
+    private String birthDate;
 
-    @Column
-    private Boolean alert_setting;
+    @Column(name = "alert_setting", nullable = false)
+    private boolean alertSetting;
 
-    @Column
-    private String reference_code;
+    @Column(name = "reference_code", length = 50)
+    private String referenceCode;
 
-    @Column
-    private String image_url;
+    @Column(name = "image_url", columnDefinition = "TEXT")
+    private String imageUrl;
 
-    @Column
-    private String refresh_token;
+    @Column(name = "refresh_token", columnDefinition = "TEXT")
+    private String refreshToken;
 
-    @Column
+    @Column(name = "status", nullable = false, length = 20)
     private String status;
 
-    @Column
-    private Timestamp create_at;
+    @Column(name = "create_at", nullable = false)
+    private java.sql.Timestamp createAt;
 
-    @Column
-    private Timestamp update_at;
+    @Column(name = "update_at")
+    private Timestamp updateAt;
+
+    @OneToMany(mappedBy = "user")
+    private List<LikedTopic> likedTopics;
+
+    @OneToMany(mappedBy = "user")
+    private List<TermAgreement> termAgreements;
 }
