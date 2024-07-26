@@ -35,5 +35,5 @@ public class PostUserRequest {
 
 
     @NotBlank(message = "birth_date: 필수입니다.")
-    private Long birth_date;
+    private String birth_date;
 }
