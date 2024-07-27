@@ -7,10 +7,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import store.itpick.backend.model.RelatedResource;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -76,6 +78,54 @@ public class Selenium {
         }
         quitDriver();
         return null;
+    }
+
+
+    public List<RelatedResource> useDriverForReference(String url, String cssSelector) throws UnsupportedEncodingException {
+        driver.get(url);
+
+        List<WebElement> webElementListByLink = driver.findElements(By.cssSelector(cssSelector));
+        List<RelatedResource> resourceList = new ArrayList<>();
+
+        for (WebElement element : webElementListByLink) {
+            String searchLink = element.getAttribute("href");
+            WebElement titleElement = element.findElement(By.cssSelector(".rank-text"));
+            String keywords = titleElement.getText();
+
+            RelatedResource resource = new RelatedResource(keywords, searchLink, "", "", "","");
+            resourceList.add(resource);
+        }
+
+        for (RelatedResource relatedResource : resourceList) {
+            String documentTitle= relatedResource.getKeywords();
+            // Google 뉴스 검색 URL 생성
+            String naverSearchUrl = "https://search.naver.com/search.naver?where=news&query=" + URLEncoder.encode(documentTitle, "UTF-8");
+            driver.get(naverSearchUrl);
+
+            // 검색 결과 페이지에서 첫 번째 링크 추출
+            WebElement webElement = driver.findElement(By.cssSelector(".news_contents"));
+
+            System.out.println("요소: " +webElement.getText());
+
+
+
+            String newsTitle = webElement.findElement(By.cssSelector(".news_tit")).getText();
+
+            String newsContent = webElement.findElement(By.cssSelector(".news_dsc")).getText();
+
+            String newsLink = webElement.findElement(By.cssSelector(".news_tit")).getAttribute("href");
+
+            String imageUrl = webElement.findElement(By.cssSelector(".thumb")).getAttribute("src");
+
+            relatedResource.setNewsTitle(newsTitle);
+            relatedResource.setNewsContent(newsContent);
+            relatedResource.setNewsLink(newsLink);
+            relatedResource.setImageUrl(imageUrl);
+        }
+
+        quitDriver();
+
+        return resourceList;
     }
 
     private void quitDriver() {

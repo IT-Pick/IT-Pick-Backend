@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import store.itpick.backend.model.RelatedResource;
 import store.itpick.backend.util.Selenium;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @RestController
@@ -44,6 +46,14 @@ public class TestController {
         String cssSelector = ".summary-text > a";
 
         return selenium.useDriver(url, cssSelector);
+    }
+
+    @GetMapping("/test/naver")
+    public List<RelatedResource> naverTest() throws UnsupportedEncodingException {
+        String url = "https://www.signal.bz/";
+        String cssSelector = ".rank-layer";
+
+        return selenium.useDriverForReference(url, cssSelector);
     }
 
     @GetMapping("/*")
