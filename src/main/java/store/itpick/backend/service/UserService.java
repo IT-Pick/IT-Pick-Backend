@@ -20,6 +20,7 @@ import store.itpick.backend.repository.UserRepository;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -41,6 +42,8 @@ public class UserService {
 
         @Value("${spring.mail.auth-code-expiration-millis}")
     private long authCodeExpirationMillis;
+    private static final String AUTH_CODE_PREFIX = "AuthCode ";
+
 
     public LoginResponse login(LoginRequest authRequest) {
 

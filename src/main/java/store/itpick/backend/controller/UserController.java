@@ -61,17 +61,17 @@ public class UserController {
     }
 
     @PostMapping("/emails/verification-requests")
-    public ResponseEntity sendMessage(@RequestParam("email") @Valid @CustomEmail String email){
+    public ResponseEntity sendMessage(@RequestParam("email") @Valid String email){
         userService.sendCodeToEmail(email);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/emails/verifications")
-    public ResponseEntity verificationEmail(@RequestParam("email") @Valid @CustomEmail String email,
+    public ResponseEntity verificationEmail(@RequestParam("email") @Valid String email,
                                             @RequestParam("code") String authCode){
-        EmailVerificationResult response = userService.verifiedCode(email, authCode);
+        userService.verifiedCode(email,authCode);
 
-        return new ResponseEntity<>(new SingleResponseDto<>(response),HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
