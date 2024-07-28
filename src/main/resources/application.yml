@@ -53,7 +53,10 @@ spring:
           timeout: 5000
           writetimeout: 5000
   auth-code-expiration-millis: 1800000
-
+  data:
+    redis:
+      host: localhost
+      port: 6380
 ---
 
 spring:
