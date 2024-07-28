@@ -40,7 +40,7 @@ public class UserService {
     private final MailService mailService;
     private final RedisService redisService;
 
-        @Value("${spring.mail.auth-code-expiration-millis}")
+    @Value("${spring.mail.auth-code-expiration-millis}")
     private long authCodeExpirationMillis;
     private static final String AUTH_CODE_PREFIX = "AuthCode ";
 

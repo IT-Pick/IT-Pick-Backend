@@ -61,17 +61,17 @@ public class UserController {
     }
 
     @PostMapping("/emails/verification-requests")
-    public ResponseEntity sendMessage(@RequestParam("email") @Valid String email){
+    public BaseResponse<Object> sendMessage(@RequestParam("email") @Valid String email){
         userService.sendCodeToEmail(email);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new BaseResponse<>(HttpStatus.OK);
     }
 
     @GetMapping("/emails/verifications")
-    public ResponseEntity verificationEmail(@RequestParam("email") @Valid String email,
+    public BaseResponse<Object> verificationEmail(@RequestParam("email") @Valid String email,
                                             @RequestParam("code") String authCode){
         userService.verifiedCode(email,authCode);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new BaseResponse<>(HttpStatus.OK);
     }
 }
