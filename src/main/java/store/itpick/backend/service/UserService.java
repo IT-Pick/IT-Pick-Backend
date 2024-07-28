@@ -121,13 +121,21 @@ public class UserService {
     }
 
     public void sendCodeToEmail(String toEmail) {
-        this.validateEmail(toEmail);
+        this.checkDuplicatedEmail(toEmail);
         String title = "ITPICK 이메일 인증 번호";
         String authCode = this.createCode();
         mailService.sendEmail(toEmail, title, authCode);
         // 이메일 인증 요청 시 인증 번호 Redis에 저장 ( key = "AuthCode " + Email / value = AuthCode )
         redisService.setValues(AUTH_CODE_PREFIX + toEmail,
                 authCode, Duration.ofMillis(this.authCodeExpirationMillis));
+    }
+
+    private void checkDuplicatedEmail(String email){
+        Optional<User> user = userRepository.getUserByEmail(email);
+        if(user.isPresent()){
+            log.debug("MemberServiceImpl.checkDuplicatedEmail exception occur email: {}", email);
+            throw new UserException(BaseExceptionResponseStatus.MEMBER_EXISTS);
+        }
     }
 
     private String createCode() {
@@ -146,7 +154,7 @@ public class UserService {
     }
 
     public void verifiedCode(String email, String authCode) {
-        this.validateEmail(email);
+        this.checkDuplicatedEmail(email);
         String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
         boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode);
 
