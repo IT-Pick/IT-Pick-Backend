@@ -46,7 +46,8 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     PASSWORD_NO_MATCH(5004, HttpStatus.BAD_REQUEST.value(), "비밀번호가 일치하지 않습니다."),
     INVALID_USER_STATUS(5005, HttpStatus.BAD_REQUEST.value(), "잘못된 회원 status 값입니다."),
     EMAIL_NOT_FOUND(5006, HttpStatus.BAD_REQUEST.value(), "존재하지 않는 이메일입니다."),
-    INVALID_PASSWORD(5007, HttpStatus.BAD_REQUEST.value(), "유효하지 않는 password입니다.");
+    INVALID_PASSWORD(5007, HttpStatus.BAD_REQUEST.value(), "유효하지 않는 password입니다."),
+    UNABLE_TO_SEND_EMAIL(5008,HttpStatus.BAD_REQUEST.value(),"메일을 전송할 수 없습니다.");
 
 
     /**
