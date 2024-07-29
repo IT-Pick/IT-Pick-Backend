@@ -27,7 +27,7 @@ public class MailService {
             throw new EmailException(BaseExceptionResponseStatus.UNABLE_TO_SEND_EMAIL);
         }
     }
-    // 발신할 이메일 데이터 세팅
+    // 발송할 이메일 데이터 세팅
     private SimpleMailMessage createEmailForm(String toEmail,
                                               String title,
                                               String text){

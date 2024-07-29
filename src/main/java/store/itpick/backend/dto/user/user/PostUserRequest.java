@@ -25,8 +25,8 @@ public class PostUserRequest {
     @NotBlank(message = "password: {NotBlank}")
     @Length(min = 8, max = 20,
             message = "password: 최소 {min}자리 ~ 최대 {max}자리까지 가능합니다")
-    @Pattern(regexp = "(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}",
-            message = "password: 대문자, 소문자, 특수문자가 적어도 하나씩은 있어야 합니다")
+    @Pattern(regexp = "(?=.*[a-z])(?=.*[0-9])(?=.*[!#$%^&*+=])(?=\\S+$).{8,20}",
+            message = "password: 소문자, 숫자, 특수문자가 적어도 하나씩은 있어야 합니다")
     private String password;
 
     @NotBlank(message = "nickname: 필수입니다.")
@@ -35,5 +35,6 @@ public class PostUserRequest {
 
 
     @NotBlank(message = "birth_date: 필수입니다.")
+    @Length(min = 6, max = 6, message = "birth_date: 정확히 {max}자리여야 합니다")
     private String birth_date;
 }

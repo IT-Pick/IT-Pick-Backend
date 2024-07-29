@@ -47,7 +47,7 @@ public class UserController {
 
 
     @PostMapping("/signup")
-    public BaseResponse<PostUserResponse> signUp(@RequestBody PostUserRequest postUserRequest, BindingResult bindingResult) {
+    public BaseResponse<PostUserResponse> signUp(@Valid @RequestBody PostUserRequest postUserRequest, BindingResult bindingResult) {
       if(bindingResult.hasErrors()){
           throw new UserException(INVALID_USER_VALUE, getErrorMessages(bindingResult));
       }
