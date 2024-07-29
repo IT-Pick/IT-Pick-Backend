@@ -91,10 +91,7 @@ public class UserService {
 
         user = userRepository.save(user);
 
-        // 회원가입에서 jwt 생성 시 여기에 로직 포함시키기
-        String jwt = "";
-
-        return new PostUserResponse(user.getUserId(), jwt);
+        return new PostUserResponse(user.getUserId());
     }
 
     private void validateEmail(String email) {
