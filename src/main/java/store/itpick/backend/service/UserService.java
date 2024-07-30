@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.EMAIL_NOT_FOUND;
-import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.PASSWORD_NO_MATCH;
+import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
 
 
 @Slf4j
@@ -96,30 +95,34 @@ public class UserService {
 
     private void validateEmail(String email) {
         if (userRepository.existsByEmailAndStatusIn(email, List.of("active", "dormant"))) {
-            throw new UserException(BaseExceptionResponseStatus.DUPLICATE_EMAIL);
+            throw new UserException(DUPLICATE_EMAIL);
         }
     }
 
     private void validateNickname(String nickname) {
         if (userRepository.existsByNicknameAndStatusIn(nickname, List.of("active", "dormant"))) {
-            throw new UserException(BaseExceptionResponseStatus.DUPLICATE_NICKNAME);
+            throw new UserException(DUPLICATE_NICKNAME);
         }
     }
 
-    public void modifyUserStatus_deleted(long userId) {
+    public void modifyUserStatus_deleted(String token) {
+        // JWT 토큰에서 사용자 ID 추출
+        Long userId = jwtTokenProvider.getUserIdFromToken(token);
+
+        // 사용자 상태를 "deleted"로 변경
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setStatus("deleted");
             userRepository.save(user);
         } else {
-            throw new UserException(BaseExceptionResponseStatus.USER_NOT_FOUND);
+            throw new UserException(USER_NOT_FOUND);
         }
     }
 
     public void sendCodeToEmail(String toEmail) {
         this.checkDuplicatedEmail(toEmail);
-        String title = "ITPICK 이메일 인증 번호";
+        String title = "ITPICK 회원가입을 위한 이메일 인증 번호입니다.";
         String authCode = this.createCode();
         mailService.sendEmail(toEmail, title, authCode);
         // 이메일 인증 요청 시 인증 번호 Redis에 저장 ( key = "AuthCode " + Email / value = AuthCode )

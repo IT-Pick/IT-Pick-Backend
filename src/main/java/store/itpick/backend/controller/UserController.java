@@ -53,10 +53,12 @@ public class UserController {
       return new BaseResponse<>(userService.signUp(postUserRequest));
     }
 
-    @PatchMapping("/{userId}/deleted")
-    public BaseResponse<Object> modifyUserStatus_deleted(@PathVariable Long userId) {
-        userService.modifyUserStatus_deleted(userId);
-        return new BaseResponse<>(null);
+    @DeleteMapping("")
+    public BaseResponse<Object> modifyUserStatus_deleted(@RequestHeader("Authorization") String token) {
+        // Authorization 헤더에서 "Bearer " 부분을 제거하고 토큰만 추출
+        String accessToken = token.replace("Bearer ", "");
+        userService.modifyUserStatus_deleted(accessToken);
+        return new BaseResponse<>(HttpStatus.OK);
     }
 
     @PostMapping("/emails/verification-requests")
