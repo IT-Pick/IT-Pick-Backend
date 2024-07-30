@@ -52,8 +52,6 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     AUTH_CODE_IS_NOT_SAME(5010, HttpStatus.BAD_REQUEST.value(), "인증 번호가 일치하지 않습니다."),
     MEMBER_EXISTS(5011,HttpStatus.BAD_REQUEST.value(), "이미 존재하는 회원입니다.");
 
-
-
     /**
      * 6000: Debate 오류
      */
