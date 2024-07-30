@@ -2,17 +2,16 @@ package store.itpick.backend.common.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import store.itpick.backend.common.exception.jwt.unauthorized.JwtExpiredTokenException;
-import store.itpick.backend.common.exception.jwt.unauthorized.JwtInvalidTokenException;
-import store.itpick.backend.common.exception.jwt.bad_request.JwtNoTokenException;
-import store.itpick.backend.common.exception.jwt.bad_request.JwtUnsupportedTokenException;
-import store.itpick.backend.jwt.JwtProvider;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import store.itpick.backend.common.exception.jwt.bad_request.JwtNoTokenException;
+import store.itpick.backend.common.exception.jwt.bad_request.JwtUnsupportedTokenException;
+import store.itpick.backend.common.exception.jwt.unauthorized.JwtExpiredTokenException;
+import store.itpick.backend.common.exception.jwt.unauthorized.JwtInvalidTokenException;
+import store.itpick.backend.jwt.JwtProvider;
 import store.itpick.backend.service.UserService;
 
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
@@ -20,7 +19,7 @@ import static store.itpick.backend.common.response.status.BaseExceptionResponseS
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtAuthInterceptor implements HandlerInterceptor {
+public class JwtAuthRefreshInterceptor implements HandlerInterceptor {
 
     private static final String JWT_TOKEN_PREFIX = "Bearer ";
     private final JwtProvider jwtProvider;
@@ -30,10 +29,10 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-        String accessToken = resolveAccessToken(request);
-        validateAccessToken(accessToken);
+        String refreshToken = resolveRefreshToken(request);
+        validateRefreshToken(refreshToken);
 
-        String email = jwtProvider.getPrincipal(accessToken);
+        String email = jwtProvider.getPrincipal(refreshToken);
         validatePayload(email);
 
         long userId = userService.getUserIdByEmail(email);
@@ -42,7 +41,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
     }
 
-    private String resolveAccessToken(HttpServletRequest request) {
+    private String resolveRefreshToken(HttpServletRequest request) {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         validateToken(token);
         return token.substring(JWT_TOKEN_PREFIX.length());
@@ -57,7 +56,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
         }
     }
 
-    private void validateAccessToken(String accessToken) {
+    private void validateRefreshToken(String accessToken) {
         if (jwtProvider.isExpiredToken(accessToken)) {
             throw new JwtExpiredTokenException(EXPIRED_TOKEN);
         }

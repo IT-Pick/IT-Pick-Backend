@@ -34,7 +34,9 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     INVALID_TOKEN(4003, HttpStatus.UNAUTHORIZED.value(), "유효하지 않은 토큰입니다."),
     MALFORMED_TOKEN(4004, HttpStatus.UNAUTHORIZED.value(), "토큰이 올바르게 구성되지 않았습니다."),
     EXPIRED_TOKEN(4005, HttpStatus.UNAUTHORIZED.value(), "만료된 토큰입니다."),
-    TOKEN_MISMATCH(4006, HttpStatus.UNAUTHORIZED.value(), "로그인 정보가 토큰 정보와 일치하지 않습니다."),
+    TOKEN_MISMATCH(4006, HttpStatus.UNAUTHORIZED.value(), "회원 정보가 토큰 정보와 일치하지 않습니다."),
+    EXPIRED_REFRESH_TOKEN(4007, HttpStatus.UNAUTHORIZED.value(), "다시 로그인 해주세요."),
+
 
     /**
      * 5000: User 오류
@@ -46,7 +48,9 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     PASSWORD_NO_MATCH(5004, HttpStatus.BAD_REQUEST.value(), "비밀번호가 일치하지 않습니다."),
     INVALID_USER_STATUS(5005, HttpStatus.BAD_REQUEST.value(), "잘못된 회원 status 값입니다."),
     EMAIL_NOT_FOUND(5006, HttpStatus.BAD_REQUEST.value(), "존재하지 않는 이메일입니다."),
-    INVALID_PASSWORD(5007, HttpStatus.BAD_REQUEST.value(), "유효하지 않는 password입니다.");
+    INVALID_PASSWORD(5007, HttpStatus.BAD_REQUEST.value(), "유효하지 않는 password입니다."),
+    INVALID_REFRESHTOKEN(5008, HttpStatus.BAD_REQUEST.value(), "유효하지 않는 토큰입니다.");
+
 
 
     /**
