@@ -94,8 +94,9 @@ public class Selenium {
         WebElement webElement = driver.findElement(By.className("issue_wrap"));
         actions.moveToElement(webElement).perform();
 
-        WebElement issueLayer = new WebDriverWait(driver, Duration.ofSeconds(5))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_layer")));
+            WebElement issueLayer = new WebDriverWait(driver, Duration.ofSeconds(5))
+                    .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_layer")));
+
         System.out.println(issueLayer.getText());
 
         quitDriver();
