@@ -83,7 +83,7 @@ public class RankController {
 //        return selenium.useDriverForMnate(url);
 //    }
 
-    @GetMapping("/*.ico")
+    @GetMapping("/*")
     void pathMatch() {
         System.out.println("favicon.ico.");
     }
