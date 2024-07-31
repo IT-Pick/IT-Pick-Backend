@@ -34,12 +34,14 @@ public class RankController {
         return selenium.useDriverForNamuwiki(url);
     }
 
+    @GetMapping("/signal")
     public List<RelatedResource> getRankFromSignal() {
         String url = "https://www.signal.bz/";
 
         return selenium.useDriverForSignal(url);
     }
 
+    @GetMapping("/mnate")
     public List<RelatedResource> getRankFromMnate() {
         String url = "https://m.nate.com/";
 
@@ -52,4 +54,9 @@ public class RankController {
 //
 //        return selenium.useDriverForMnate(url);
 //    }
+
+    @GetMapping("/*.ico")
+    void pathMatch() {
+        System.out.println("favicon.ico.");
+    }
 }

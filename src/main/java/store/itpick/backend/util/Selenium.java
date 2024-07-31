@@ -87,7 +87,7 @@ public class Selenium {
         return null;
     }
 
-    public List<RelatedResource> useDriverForZum(String url)  {
+    public List<RelatedResource> useDriverForZum(String url) {
         driver.get(url);
 
         Actions actions = new Actions(driver);
@@ -201,7 +201,7 @@ public class Selenium {
             WebElement titleElement = element.findElement(By.cssSelector(".rank-text"));
             String keywords = titleElement.getText();
 
-            RelatedResource resource = new RelatedResource(keywords, searchLink, "", "", "","");
+            RelatedResource resource = new RelatedResource(keywords, searchLink, "", "", "", "");
             resourceList.add(resource);
         }
         SearchRelatedReferrence(resourceList);
@@ -210,7 +210,7 @@ public class Selenium {
         return resourceList;
     }
 
-    public List<RelatedResource> useDriverForMnate(String url)  {
+    public List<RelatedResource> useDriverForMnate(String url) {
         driver.get(url);
         Actions actions = new Actions(driver);
 
@@ -267,9 +267,9 @@ public class Selenium {
         return resourceList;
     }
 
-    private void SearchRelatedReferrence(List<RelatedResource> resourceList)  {
+    private void SearchRelatedReferrence(List<RelatedResource> resourceList) {
         for (RelatedResource relatedResource : resourceList) {
-            String documentTitle= relatedResource.getKeywords();
+            String documentTitle = relatedResource.getKeywords();
             // Google 뉴스 검색 URL 생성
             String naverSearchUrl = null;
             try {
@@ -289,7 +289,6 @@ public class Selenium {
             String newsLink = webElement.findElement(By.cssSelector(".news_tit")).getAttribute("href");
 
             String imageUrl = webElement.findElement(By.cssSelector(".thumb")).getAttribute("src");
-
 
             relatedResource.setNewsTitle(newsTitle);
             relatedResource.setNewsContent(newsContent);
