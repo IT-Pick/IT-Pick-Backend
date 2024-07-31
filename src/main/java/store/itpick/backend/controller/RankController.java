@@ -2,7 +2,6 @@ package store.itpick.backend.controller;
 
 import org.openqa.selenium.TimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,9 +18,6 @@ public class RankController {
 
     @Autowired
     private Selenium selenium;
-
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
     // 최대 재시도 횟수와 재시도 간격 (초)
     private static final int MAX_RETRIES = 5;
@@ -67,7 +63,7 @@ public class RankController {
     @GetMapping("/signal")
     public List<RelatedResource> getRankFromSignal() {
         String url = "https://www.signal.bz/";
-        return executeWithRetries(() -> selenium.useDriverForSignal(url), "Signal 데이터 수집");
+        return executeWithRetries(() -> selenium.useDriverForNaver(url), "Signal 데이터 수집");
     }
 
     @GetMapping("/mnate")
@@ -82,9 +78,4 @@ public class RankController {
 //
 //        return selenium.useDriverForMnate(url);
 //    }
-
-    @GetMapping("/*.ico")
-    void pathMatch() {
-        System.out.println("favicon.ico.");
-    }
 }

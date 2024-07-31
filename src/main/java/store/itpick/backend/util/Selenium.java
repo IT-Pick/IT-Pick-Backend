@@ -1,6 +1,7 @@
 package store.itpick.backend.util;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -13,6 +14,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import store.itpick.backend.model.PeriodType;
 import store.itpick.backend.model.RelatedResource;
 
 import java.io.UnsupportedEncodingException;
@@ -24,12 +26,15 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class Selenium {
     private WebDriver driver;
     private final static String WEB_DRIVER_ID = "webdriver.chrome.driver"; // Properties 설정
 
     @Value("${web-driver.path}")
     private String WEB_DRIVER_PATH;
+
+    private final Redis redis;
 
     // ChromeDriver 연결 (WEB_DRIVER_PATH 값 주입되고 사용해야 하므로 PostConstruct)
     @PostConstruct
@@ -40,7 +45,7 @@ public class Selenium {
 
         // 웹드라이버 옵션 설정
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless"); // 브라우저 UI 없이 실행
+//        options.addArguments("--headless"); // 브라우저 UI 없이 실행
         options.addArguments("--lang=ko");  // 브라우저 언어를 한국어로 설정
         /*
             @ 샌드박스 비활성화
@@ -96,9 +101,8 @@ public class Selenium {
         try {
             WebElement btn = driver.findElement(By.className("btn-layer-close-day"));
             actions.click(btn).perform();
-        }catch (NoSuchElementException e){}
-
-
+        } catch (NoSuchElementException e) {
+        }
 
         WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_wrap")));
@@ -116,13 +120,14 @@ public class Selenium {
         // 키워드 수집
         List<RelatedResource> resourceList = new ArrayList<>();
         List<WebElement> webElementByKeyword = issueLayer.findElements(By.className("inner_txt"));
-        List<String> keywordsList = new ArrayList<>();
+        List<String> keywordList = new ArrayList<>();
         for (WebElement element : webElementByKeyword) {
             String keywords = element.getText();
 
-            keywordsList.add(keywords);
+            keywordList.add(keywords);
             System.out.println(keywords);
         }
+        redis.saveAll(PeriodType.BY_REAL_TIME, "zum", keywordList);
 
         // 링크 수집
         List<WebElement> webElementBySearchLink = issueLayer.findElements(By.cssSelector(".link"));
@@ -134,9 +139,9 @@ public class Selenium {
         }
 
         // 키워드와 링크를 매칭하여 resourceList에 추가
-        int size = Math.min(keywordsList.size(), linksList.size());
+        int size = Math.min(keywordList.size(), linksList.size());
         for (int i = 0; i < size; i++) {
-            String keyword = keywordsList.get(i);
+            String keyword = keywordList.get(i);
             String link = linksList.get(i);
 
             RelatedResource resource = new RelatedResource(keyword, link, "", "", "", "");
@@ -144,7 +149,7 @@ public class Selenium {
         }
         SearchRelatedReferrence(resourceList);
 
-        quitDriver();
+//        quitDriver();
         return resourceList;
     }
 
@@ -195,23 +200,26 @@ public class Selenium {
 //        return null;
 //    }
 
-    public List<RelatedResource> useDriverForSignal(String url) {
+    public List<RelatedResource> useDriverForNaver(String url) {
         driver.get(url);
 
         List<WebElement> webElementListByLink = driver.findElements(By.cssSelector(".rank-layer"));
         List<RelatedResource> resourceList = new ArrayList<>();
+        List<String> keywordList = new ArrayList<>();
 
         for (WebElement element : webElementListByLink) {
             String searchLink = element.getAttribute("href");
             WebElement titleElement = element.findElement(By.cssSelector(".rank-text"));
-            String keywords = titleElement.getText();
+            String keyword = titleElement.getText();
+            keywordList.add(keyword);
 
-            RelatedResource resource = new RelatedResource(keywords, searchLink, "", "", "", "");
+            RelatedResource resource = new RelatedResource(keyword, searchLink, "", "", "", "");
             resourceList.add(resource);
         }
+        redis.saveAll(PeriodType.BY_REAL_TIME, "naver", keywordList);
         SearchRelatedReferrence(resourceList);
 
-        quitDriver();
+//        quitDriver();
         return resourceList;
     }
 
@@ -229,7 +237,7 @@ public class Selenium {
         // 키워드 수집
         List<RelatedResource> resourceList = new ArrayList<>();
         List<WebElement> webElementByKeyword = webElement.findElements(By.className("kw"));
-        List<String> keywordsList = new ArrayList<>();
+        List<String> keywordList = new ArrayList<>();
         for (int i = 0; i < webElementByKeyword.size(); i++) {
             WebElement element = webElementByKeyword.get(i);
             String keywords = element.getText();
@@ -244,9 +252,10 @@ public class Selenium {
                 keywords = keywords.substring(1);
             }
 
-            keywordsList.add(keywords);
+            keywordList.add(keywords);
             System.out.println(keywords);
         }
+        redis.saveAll(PeriodType.BY_REAL_TIME, "nate", keywordList);
 
         // 링크 수집
         List<WebElement> webElementBySearchLink = webElement.findElements(By.cssSelector("a"));
@@ -258,9 +267,9 @@ public class Selenium {
         }
 
         // 키워드와 링크를 매칭하여 resourceList에 추가
-        int size = Math.min(keywordsList.size(), linksList.size());
+        int size = Math.min(keywordList.size(), linksList.size());
         for (int i = 0; i < size; i++) {
-            String keyword = keywordsList.get(i);
+            String keyword = keywordList.get(i);
             String link = linksList.get(i);
 
             RelatedResource resource = new RelatedResource(keyword, link, "", "", "", "");
@@ -268,7 +277,7 @@ public class Selenium {
         }
         SearchRelatedReferrence(resourceList);
 
-        quitDriver();
+//        quitDriver();
         return resourceList;
     }
 
