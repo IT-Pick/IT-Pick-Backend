@@ -122,10 +122,10 @@ public class Selenium {
         List<WebElement> webElementByKeyword = issueLayer.findElements(By.className("inner_txt"));
         List<String> keywordList = new ArrayList<>();
         for (WebElement element : webElementByKeyword) {
-            String keywords = element.getText();
+            String keyword = element.getText();
 
-            keywordList.add(keywords);
-            System.out.println(keywords);
+            keywordList.add(keyword);
+            System.out.println(keyword);
         }
         redis.saveAll(PeriodType.BY_REAL_TIME, "zum", keywordList);
 
@@ -220,6 +220,7 @@ public class Selenium {
         SearchRelatedReferrence(resourceList);
 
 //        quitDriver();
+
         return resourceList;
     }
 
