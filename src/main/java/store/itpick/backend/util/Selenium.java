@@ -7,6 +7,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import store.itpick.backend.model.RelatedResource;
@@ -14,6 +17,7 @@ import store.itpick.backend.model.RelatedResource;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +39,7 @@ public class Selenium {
 
         // 웹드라이버 옵션 설정
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless"); // 브라우저 UI 없이 실행
+//        options.addArguments("--headless"); // 브라우저 UI 없이 실행
         options.addArguments("--lang=ko");  // 브라우저 언어를 한국어로 설정
         /*
             @ 샌드박스 비활성화
@@ -45,6 +49,9 @@ public class Selenium {
         options.addArguments("--no-sandbox");   // 샌드박스 비활성화 -> 리소스 절약
         options.addArguments("--disable-dev-shm-usage");    // /dev/shm 사용 비활성화
         options.addArguments("--disable-gpu");  //  GPU 가속 비활성화
+        options.addArguments("--start-maximized");
+        options.addArguments("--disable-popup-blocking");
+        options.addArguments("user-agent=");
 //        options.setCapability("ignoreProtectedModeSettings", true);   // 보호 모드 설정 무시
 
         // 웹드라이버 생성
@@ -80,8 +87,197 @@ public class Selenium {
         return null;
     }
 
+    public List<RelatedResource> useDriverForZum(String url)  {
 
-    public List<RelatedResource> useDriverForReference(String url, String cssSelector) throws UnsupportedEncodingException {
+
+        driver.get(url);
+
+        Actions actions = new Actions(driver);
+
+        WebElement btn = driver.findElement(By.className("btn-layer-close-day"));
+        actions.click(btn).perform();
+
+        WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_wrap")));
+        actions.moveToElement(webElement).perform();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        WebElement issueLayer = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_layer")));
+
+
+        List<RelatedResource> resourceList = new ArrayList<>();
+
+        // 키워드 수집
+        List<WebElement> webElementByKeyword = issueLayer.findElements(By.className("inner_txt"));
+        List<String> keywordsList = new ArrayList<>();
+        for (int i = 0; i < webElementByKeyword.size(); i++) {
+            WebElement element = webElementByKeyword.get(i);
+            String keywords = element.getText();
+
+            keywordsList.add(keywords);
+            System.out.println(keywords);
+        }
+
+
+
+        // 링크 수집
+        List<WebElement> webElementBySearchLink = issueLayer.findElements(By.cssSelector(".link"));
+        List<String> linksList = new ArrayList<>();
+        for (WebElement element : webElementBySearchLink) {
+            String searchLink = element.getAttribute("href");
+            linksList.add(searchLink);
+            System.out.println(searchLink);
+        }
+
+        // 키워드와 링크를 매칭하여 resourceList에 추가
+        int size = Math.min(keywordsList.size(), linksList.size());
+
+        for (int i = 0; i < size; i++) {
+            String keyword = keywordsList.get(i);
+            String link = linksList.get(i);
+            // RelatedResource 객체를 생성하고 list에 추가
+            RelatedResource resource = new RelatedResource(keyword, link, "", "", "", "");
+            resourceList.add(resource);
+        }
+
+        SearchRelatedReferrence(resourceList);
+
+        quitDriver();
+        return resourceList;
+    }
+
+    public String useDriverForNamuwiki(String url) {
+        driver.get(url);
+
+        Actions actions = new Actions(driver);
+
+        // class명으로 하면 되지만, 계속 변경됨
+//        WebElement webElement = driver.findElement(By.className("jM2TE0NV"));
+//        actions.moveToElement(webElement).perform();
+//        WebElement ul = new WebDriverWait(driver, Duration.ofSeconds(3))
+//                .until(ExpectedConditions.visibilityOfElementLocated(By.className("_0SwtPj9H")));
+//        System.out.println(ul.getText());
+
+        // xpath
+//        WebElement webElement = driver.findElement(By.xpath("/html/body/div/div[1]/div[2]/div/div[6]/div[4]/div"));
+//        actions.moveToElement(webElement).perform();
+//        WebElement ul = new WebDriverWait(driver, Duration.ofSeconds(3))
+//                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/div[1]/div[2]/div/div[6]/div[4]/div/ul")));
+//        System.out.println(ul.getText());
+
+        // until을 통해 준비되는대로 바로 실행
+        // 다만, 나무위키의 div 개수가 동적으로 변경되어서 xpath를 어떻게 할지 고민
+//        WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(10))
+//                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"app\"]/div[1]/div[2]/div/div[4]/div[2]/div")));
+        WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"app\"]/div[1]/div[2]/div/div[6]/div[4]/div")));
+        actions.moveToElement(webElement).perform();
+
+//        WebElement ul = new WebDriverWait(driver, Duration.ofSeconds(10))
+//                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"app\"]/div[1]/div[2]/div/div[4]/div[2]/div/ul")));
+        WebElement ul = new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"app\"]/div[1]/div[2]/div/div[6]/div[4]/div/ul")));
+        System.out.println(ul.getText());
+
+        quitDriver();
+        return null;
+    }
+
+    public List<RelatedResource> useDriverForSignal(String url) {
+        driver.get(url);
+
+        List<WebElement> webElementListByLink = driver.findElements(By.cssSelector(".rank-layer"));
+        List<RelatedResource> resourceList = new ArrayList<>();
+
+        for (WebElement element : webElementListByLink) {
+            String searchLink = element.getAttribute("href");
+            WebElement titleElement = element.findElement(By.cssSelector(".rank-text"));
+            String keywords = titleElement.getText();
+
+            RelatedResource resource = new RelatedResource(keywords, searchLink, "", "", "","");
+            resourceList.add(resource);
+        }
+
+        SearchRelatedReferrence(resourceList);
+
+        quitDriver();
+
+        return resourceList;
+    }
+
+    public List<RelatedResource> useDriverForMnate(String url)  {
+        driver.get(url);
+
+        Actions actions = new Actions(driver);
+
+        WebElement btn = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.className("btn_open")));
+        actions.click(btn).perform();
+
+        WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.className("rankList")));
+
+        List<RelatedResource> resourceList = new ArrayList<>();
+
+        // 키워드 수집
+        List<WebElement> webElementByKeyword = webElement.findElements(By.className("kw"));
+        List<String> keywordsList = new ArrayList<>();
+        for (int i = 0; i < webElementByKeyword.size(); i++) {
+            WebElement element = webElementByKeyword.get(i);
+            String keywords = element.getText();
+
+            // 문자열 맨 앞 1개 문자 제거
+            if (keywords.length() > 0) {
+                keywords = keywords.substring(1);
+            }
+
+//             마지막 루프에서는 맨 앞 2개 문자 제거
+            if (i == webElementByKeyword.size() - 1 && keywords.length() > 1) {
+                keywords = keywords.substring(1);
+            }
+
+            keywordsList.add(keywords);
+            System.out.println(keywords);
+        }
+
+
+
+        // 링크 수집
+        List<WebElement> webElementBySearchLink = webElement.findElements(By.cssSelector("a"));
+        List<String> linksList = new ArrayList<>();
+        for (WebElement element : webElementBySearchLink) {
+            String searchLink = element.getAttribute("href");
+            linksList.add(searchLink);
+            System.out.println(searchLink);
+        }
+
+        // 키워드와 링크를 매칭하여 resourceList에 추가
+        int size = Math.min(keywordsList.size(), linksList.size());
+
+        for (int i = 0; i < size; i++) {
+            String keyword = keywordsList.get(i);
+            String link = linksList.get(i);
+            // RelatedResource 객체를 생성하고 list에 추가
+            RelatedResource resource = new RelatedResource(keyword, link, "", "", "", "");
+            resourceList.add(resource);
+        }
+
+        SearchRelatedReferrence(resourceList);
+
+
+
+        quitDriver();
+        return resourceList;
+    }
+
+
+    public List<RelatedResource> useDriverForReference(String url, String cssSelector)  {
         driver.get(url);
 
         List<WebElement> webElementListByLink = driver.findElements(By.cssSelector(cssSelector));
@@ -96,18 +292,30 @@ public class Selenium {
             resourceList.add(resource);
         }
 
+        SearchRelatedReferrence(resourceList);
+
+        quitDriver();
+
+        return resourceList;
+    }
+
+
+    //Todo
+
+    private void SearchRelatedReferrence(List<RelatedResource> resourceList)  {
         for (RelatedResource relatedResource : resourceList) {
             String documentTitle= relatedResource.getKeywords();
             // Google 뉴스 검색 URL 생성
-            String naverSearchUrl = "https://search.naver.com/search.naver?where=news&query=" + URLEncoder.encode(documentTitle, "UTF-8");
+            String naverSearchUrl = null;
+            try {
+                naverSearchUrl = "https://search.naver.com/search.naver?where=news&query=" + URLEncoder.encode(documentTitle, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
             driver.get(naverSearchUrl);
 
             // 검색 결과 페이지에서 첫 번째 링크 추출
             WebElement webElement = driver.findElement(By.cssSelector(".news_contents"));
-
-            System.out.println("요소: " +webElement.getText());
-
-
 
             String newsTitle = webElement.findElement(By.cssSelector(".news_tit")).getText();
 
@@ -117,15 +325,12 @@ public class Selenium {
 
             String imageUrl = webElement.findElement(By.cssSelector(".thumb")).getAttribute("src");
 
+
             relatedResource.setNewsTitle(newsTitle);
             relatedResource.setNewsContent(newsContent);
             relatedResource.setNewsLink(newsLink);
             relatedResource.setImageUrl(imageUrl);
         }
-
-        quitDriver();
-
-        return resourceList;
     }
 
     private void quitDriver() {

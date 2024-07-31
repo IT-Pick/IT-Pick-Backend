@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import store.itpick.backend.common.response.BaseResponse;
+import store.itpick.backend.model.RelatedResource;
 import store.itpick.backend.model.RelatedResource;
 import store.itpick.backend.util.Selenium;
 
@@ -43,13 +45,14 @@ public class TestController {
     @GetMapping("/test/selenium")
     public String seleniumTest() {
         String url = "https://trends.google.com/trends/trendingsearches/daily?geo=KR&hl=ko";
-        String cssSelector = ".summary-text > a";
+//        String cssSelector = ".summary-text > a";
+        String cssSelector = ".details-top > div > span";
 
         return selenium.useDriver(url, cssSelector);
     }
 
     @GetMapping("/test/naver")
-    public List<RelatedResource> naverTest() throws UnsupportedEncodingException {
+    public List<RelatedResource> naverTest() {
         String url = "https://www.signal.bz/";
         String cssSelector = ".rank-layer";
 
