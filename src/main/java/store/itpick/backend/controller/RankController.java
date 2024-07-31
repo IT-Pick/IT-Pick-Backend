@@ -67,7 +67,7 @@ public class RankController {
     @GetMapping("/signal")
     public List<RelatedResource> getRankFromSignal() {
         String url = "https://www.signal.bz/";
-        return executeWithRetries(() -> selenium.useDriverForSignal(url), "Signal 데이터 수집");
+        return executeWithRetries(() -> selenium.useDriverForNaver(url), "Signal 데이터 수집");
     }
 
     @GetMapping("/mnate")
@@ -82,9 +82,4 @@ public class RankController {
 //
 //        return selenium.useDriverForMnate(url);
 //    }
-
-    @GetMapping("/*.ico")
-    void pathMatch() {
-        System.out.println("favicon.ico.");
-    }
 }

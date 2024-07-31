@@ -43,4 +43,9 @@ public class TestController {
 
         return selenium.useDriver(url, cssSelector);
     }
+
+    @GetMapping("/*.ico")
+    void pathMatch() {
+        System.out.println("favicon.ico.");
+    }
 }
