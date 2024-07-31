@@ -1,6 +1,5 @@
 package store.itpick.backend.controller;
 
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -8,14 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import store.itpick.backend.common.response.BaseResponse;
-import store.itpick.backend.model.RelatedResource;
-import store.itpick.backend.model.RelatedResource;
 import store.itpick.backend.util.Selenium;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 @RestController
 public class TestController {
@@ -30,8 +24,7 @@ public class TestController {
     public String testRedis() {
         // Redis에 값을 저장하고 다시 가져와서 확인
         redisTemplate.opsForValue().set("testKey", "Hello, Redis!");
-        String value = redisTemplate.opsForValue().get("testKey");
-        return value;
+        return redisTemplate.opsForValue().get("testKey");
     }
 
     @GetMapping("/test/jsoup")
@@ -49,18 +42,5 @@ public class TestController {
         String cssSelector = ".details-top > div > span";
 
         return selenium.useDriver(url, cssSelector);
-    }
-
-    @GetMapping("/test/naver")
-    public List<RelatedResource> naverTest() {
-        String url = "https://www.signal.bz/";
-        String cssSelector = ".rank-layer";
-
-        return selenium.useDriverForReference(url, cssSelector);
-    }
-
-    @GetMapping("/*")
-    void pathMatch() {
-        System.out.println("favicon.ico.");
     }
 }
