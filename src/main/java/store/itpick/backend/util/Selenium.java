@@ -40,7 +40,7 @@ public class Selenium {
 
         // 웹드라이버 옵션 설정
         ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--headless"); // 브라우저 UI 없이 실행
+        options.addArguments("--headless"); // 브라우저 UI 없이 실행
         options.addArguments("--lang=ko");  // 브라우저 언어를 한국어로 설정
         /*
             @ 샌드박스 비활성화
