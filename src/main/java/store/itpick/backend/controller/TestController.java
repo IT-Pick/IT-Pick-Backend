@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import store.itpick.backend.common.response.BaseResponse;
 import store.itpick.backend.model.RelatedResource;
+import store.itpick.backend.model.RelatedResource;
 import store.itpick.backend.util.Selenium;
 
 import java.io.IOException;
