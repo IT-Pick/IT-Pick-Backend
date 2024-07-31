@@ -51,7 +51,7 @@ public class TestController {
     }
 
     @GetMapping("/test/naver")
-    public List<RelatedResource> naverTest() throws UnsupportedEncodingException {
+    public List<RelatedResource> naverTest() {
         String url = "https://www.signal.bz/";
         String cssSelector = ".rank-layer";
 

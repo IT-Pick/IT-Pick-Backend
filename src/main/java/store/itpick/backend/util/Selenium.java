@@ -19,7 +19,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.time.Duration;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -88,7 +87,9 @@ public class Selenium {
         return null;
     }
 
-    public String useDriverForZum(String url) {
+    public List<RelatedResource> useDriverForZum(String url)  {
+
+
         driver.get(url);
 
         Actions actions = new Actions(driver);
@@ -96,15 +97,59 @@ public class Selenium {
         WebElement btn = driver.findElement(By.className("btn-layer-close-day"));
         actions.click(btn).perform();
 
-        WebElement webElement = driver.findElement(By.className("issue_wrap"));
+        WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_wrap")));
         actions.moveToElement(webElement).perform();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         WebElement issueLayer = new WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_layer")));
-        System.out.println(issueLayer.getText());
+
+
+        List<RelatedResource> resourceList = new ArrayList<>();
+
+        // 키워드 수집
+        List<WebElement> webElementByKeyword = issueLayer.findElements(By.className("inner_txt"));
+        List<String> keywordsList = new ArrayList<>();
+        for (int i = 0; i < webElementByKeyword.size(); i++) {
+            WebElement element = webElementByKeyword.get(i);
+            String keywords = element.getText();
+
+            keywordsList.add(keywords);
+            System.out.println(keywords);
+        }
+
+
+
+        // 링크 수집
+        List<WebElement> webElementBySearchLink = issueLayer.findElements(By.cssSelector(".link"));
+        List<String> linksList = new ArrayList<>();
+        for (WebElement element : webElementBySearchLink) {
+            String searchLink = element.getAttribute("href");
+            linksList.add(searchLink);
+            System.out.println(searchLink);
+        }
+
+        // 키워드와 링크를 매칭하여 resourceList에 추가
+        int size = Math.min(keywordsList.size(), linksList.size());
+
+        for (int i = 0; i < size; i++) {
+            String keyword = keywordsList.get(i);
+            String link = linksList.get(i);
+            // RelatedResource 객체를 생성하고 list에 추가
+            RelatedResource resource = new RelatedResource(keyword, link, "", "", "", "");
+            resourceList.add(resource);
+        }
+
+        SearchRelatedReferrence(resourceList);
 
         quitDriver();
-        return null;
+        return resourceList;
     }
 
     public String useDriverForNamuwiki(String url) {
@@ -144,17 +189,29 @@ public class Selenium {
         return null;
     }
 
-    public String useDriverForSignal(String url) {
+    public List<RelatedResource> useDriverForSignal(String url) {
         driver.get(url);
 
-        WebElement webElement = driver.findElement(By.className("realtime-rank"));
-        System.out.println(webElement.getText());
+        List<WebElement> webElementListByLink = driver.findElements(By.cssSelector(".rank-layer"));
+        List<RelatedResource> resourceList = new ArrayList<>();
+
+        for (WebElement element : webElementListByLink) {
+            String searchLink = element.getAttribute("href");
+            WebElement titleElement = element.findElement(By.cssSelector(".rank-text"));
+            String keywords = titleElement.getText();
+
+            RelatedResource resource = new RelatedResource(keywords, searchLink, "", "", "","");
+            resourceList.add(resource);
+        }
+
+        SearchRelatedReferrence(resourceList);
 
         quitDriver();
-        return null;
+
+        return resourceList;
     }
 
-    public List<RelatedResource> useDriverForMnate(String url) throws UnsupportedEncodingException {
+    public List<RelatedResource> useDriverForMnate(String url)  {
         driver.get(url);
 
         Actions actions = new Actions(driver);
@@ -220,7 +277,7 @@ public class Selenium {
     }
 
 
-    public List<RelatedResource> useDriverForReference(String url, String cssSelector) throws UnsupportedEncodingException {
+    public List<RelatedResource> useDriverForReference(String url, String cssSelector)  {
         driver.get(url);
 
         List<WebElement> webElementListByLink = driver.findElements(By.cssSelector(cssSelector));
@@ -242,16 +299,23 @@ public class Selenium {
         return resourceList;
     }
 
-    private void SearchRelatedReferrence(List<RelatedResource> resourceList) throws UnsupportedEncodingException {
+
+    //Todo
+
+    private void SearchRelatedReferrence(List<RelatedResource> resourceList)  {
         for (RelatedResource relatedResource : resourceList) {
             String documentTitle= relatedResource.getKeywords();
             // Google 뉴스 검색 URL 생성
-            String naverSearchUrl = "https://search.naver.com/search.naver?where=news&query=" + URLEncoder.encode(documentTitle, "UTF-8");
+            String naverSearchUrl = null;
+            try {
+                naverSearchUrl = "https://search.naver.com/search.naver?where=news&query=" + URLEncoder.encode(documentTitle, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
             driver.get(naverSearchUrl);
 
             // 검색 결과 페이지에서 첫 번째 링크 추출
             WebElement webElement = driver.findElement(By.cssSelector(".news_contents"));
-
 
             String newsTitle = webElement.findElement(By.cssSelector(".news_tit")).getText();
 
@@ -259,19 +323,7 @@ public class Selenium {
 
             String newsLink = webElement.findElement(By.cssSelector(".news_tit")).getAttribute("href");
 
-
-            // 이미지 URL 추출, 없을 경우 빈 문자열로 설정
-            String imageUrl = "";
-            try {
-                WebElement imageElement = webElement.findElement(By.cssSelector(".thumb"));
-                if (imageElement != null) {
-                    imageUrl = imageElement.getAttribute("src");
-                }
-            } catch (NoSuchElementException e) {
-                // 이미지 요소가 없을 경우
-                imageUrl = "";
-            }
-
+            String imageUrl = webElement.findElement(By.cssSelector(".thumb")).getAttribute("src");
 
 
             relatedResource.setNewsTitle(newsTitle);
