@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RelatedResource {
+public class Reference {
     private String keywords;
     private String searchLink;
     private String newsTitle;
@@ -13,7 +13,7 @@ public class RelatedResource {
     private String newsLink;
     private String imageUrl;
 
-    public RelatedResource(String keywords, String searchLink, String newsTitle, String newsContent, String newsLink, String imageUrl) {
+    public Reference(String keywords, String searchLink, String newsTitle, String newsContent, String newsLink, String imageUrl) {
         this.keywords = keywords;
         this.searchLink = searchLink;
         this.newsTitle = newsTitle;

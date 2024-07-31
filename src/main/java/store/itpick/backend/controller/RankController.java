@@ -6,7 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import store.itpick.backend.model.RelatedResource;
+import store.itpick.backend.model.Reference;
 import store.itpick.backend.util.Selenium;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class RankController {
     }
 
     @GetMapping("/zum")
-    public List<RelatedResource> getRankFromZum() {
+    public List<Reference> getRankFromZum() {
         String url = "https://zum.com/";
         return executeWithRetries(() -> selenium.useDriverForZum(url), "Zum 데이터 수집");
     }
@@ -65,13 +65,13 @@ public class RankController {
     }
 
     @GetMapping("/signal")
-    public List<RelatedResource> getRankFromSignal() {
+    public List<Reference> getRankFromSignal() {
         String url = "https://www.signal.bz/";
         return executeWithRetries(() -> selenium.useDriverForNaver(url), "Signal 데이터 수집");
     }
 
     @GetMapping("/mnate")
-    public List<RelatedResource> getRankFromMnate() {
+    public List<Reference> getRankFromMnate() {
         String url = "https://m.nate.com/";
         return executeWithRetries(() -> selenium.useDriverForMnate(url), "Mnate 데이터 수집");
     }

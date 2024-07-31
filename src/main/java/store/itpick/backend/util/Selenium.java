@@ -15,7 +15,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import store.itpick.backend.model.PeriodType;
-import store.itpick.backend.model.RelatedResource;
+import store.itpick.backend.model.Reference;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -93,7 +93,7 @@ public class Selenium {
         return null;
     }
 
-    public List<RelatedResource> useDriverForZum(String url) {
+    public List<Reference> useDriverForZum(String url) {
         driver.get(url);
 
         Actions actions = new Actions(driver);
@@ -118,7 +118,7 @@ public class Selenium {
                 .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_layer")));
 
         // 키워드 수집
-        List<RelatedResource> resourceList = new ArrayList<>();
+        List<Reference> references = new ArrayList<>();
         List<WebElement> webElementByKeyword = issueLayer.findElements(By.className("inner_txt"));
         List<String> keywordList = new ArrayList<>();
         for (WebElement element : webElementByKeyword) {
@@ -144,13 +144,13 @@ public class Selenium {
             String keyword = keywordList.get(i);
             String link = linksList.get(i);
 
-            RelatedResource resource = new RelatedResource(keyword, link, "", "", "", "");
-            resourceList.add(resource);
+            Reference reference = new Reference(keyword, link, "", "", "", "");
+            references.add(reference);
         }
-        SearchRelatedReferrence(resourceList);
+        SearchReference(references);
 
 //        quitDriver();
-        return resourceList;
+        return references;
     }
 
     public String useDriverForNamuwiki(String url) {
@@ -200,11 +200,11 @@ public class Selenium {
 //        return null;
 //    }
 
-    public List<RelatedResource> useDriverForNaver(String url) {
+    public List<Reference> useDriverForNaver(String url) {
         driver.get(url);
 
         List<WebElement> webElementListByLink = driver.findElements(By.cssSelector(".rank-layer"));
-        List<RelatedResource> resourceList = new ArrayList<>();
+        List<Reference> references = new ArrayList<>();
         List<String> keywordList = new ArrayList<>();
 
         for (WebElement element : webElementListByLink) {
@@ -213,18 +213,18 @@ public class Selenium {
             String keyword = titleElement.getText();
             keywordList.add(keyword);
 
-            RelatedResource resource = new RelatedResource(keyword, searchLink, "", "", "", "");
-            resourceList.add(resource);
+            Reference reference = new Reference(keyword, searchLink, "", "", "", "");
+            references.add(reference);
         }
         redis.saveAll(PeriodType.BY_REAL_TIME, "naver", keywordList);
-        SearchRelatedReferrence(resourceList);
+        SearchReference(references);
 
 //        quitDriver();
 
-        return resourceList;
+        return references;
     }
 
-    public List<RelatedResource> useDriverForMnate(String url) {
+    public List<Reference> useDriverForMnate(String url) {
         driver.get(url);
         Actions actions = new Actions(driver);
 
@@ -236,7 +236,7 @@ public class Selenium {
                 .until(ExpectedConditions.visibilityOfElementLocated(By.className("rankList")));
 
         // 키워드 수집
-        List<RelatedResource> resourceList = new ArrayList<>();
+        List<Reference> references = new ArrayList<>();
         List<WebElement> webElementByKeyword = webElement.findElements(By.className("kw"));
         List<String> keywordList = new ArrayList<>();
         for (int i = 0; i < webElementByKeyword.size(); i++) {
@@ -273,18 +273,18 @@ public class Selenium {
             String keyword = keywordList.get(i);
             String link = linksList.get(i);
 
-            RelatedResource resource = new RelatedResource(keyword, link, "", "", "", "");
-            resourceList.add(resource);
+            Reference reference = new Reference(keyword, link, "", "", "", "");
+            references.add(reference);
         }
-        SearchRelatedReferrence(resourceList);
+        SearchReference(references);
 
 //        quitDriver();
-        return resourceList;
+        return references;
     }
 
-    private void SearchRelatedReferrence(List<RelatedResource> resourceList) {
-        for (RelatedResource relatedResource : resourceList) {
-            String documentTitle = relatedResource.getKeywords();
+    private void SearchReference(List<Reference> references) {
+        for (Reference reference : references) {
+            String documentTitle = reference.getKeywords();
             // Google 뉴스 검색 URL 생성
             String naverSearchUrl = null;
             try {
@@ -305,10 +305,10 @@ public class Selenium {
 
             String imageUrl = webElement.findElement(By.cssSelector(".thumb")).getAttribute("src");
 
-            relatedResource.setNewsTitle(newsTitle);
-            relatedResource.setNewsContent(newsContent);
-            relatedResource.setNewsLink(newsLink);
-            relatedResource.setImageUrl(imageUrl);
+            reference.setNewsTitle(newsTitle);
+            reference.setNewsContent(newsContent);
+            reference.setNewsLink(newsLink);
+            reference.setImageUrl(imageUrl);
         }
     }
 
