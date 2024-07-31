@@ -3,6 +3,7 @@ package store.itpick.backend.util;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -92,8 +93,12 @@ public class Selenium {
 
         Actions actions = new Actions(driver);
 
-        WebElement btn = driver.findElement(By.className("btn-layer-close-day"));
-        actions.click(btn).perform();
+        try {
+            WebElement btn = driver.findElement(By.className("btn-layer-close-day"));
+            actions.click(btn).perform();
+        }catch (NoSuchElementException e){}
+
+
 
         WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_wrap")));
