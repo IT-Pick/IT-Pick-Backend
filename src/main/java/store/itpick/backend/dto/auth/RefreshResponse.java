@@ -4,5 +4,5 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class RefreshResponse {
-    private String refreshToken;
+    private String accessToken;
 }

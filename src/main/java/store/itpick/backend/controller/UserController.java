@@ -63,9 +63,8 @@ public class UserController {
     /**
      * 로그아웃 : db의 refresh 토큰을 null로 설정
      */
-    @PatchMapping("/{userId}/logout")
-    public BaseResponse<Object> logout(@PathVariable Long userId, @PreAuthorize long header_userId) {
-        userService.validationUserId(userId, header_userId);
+    @PatchMapping("/logout")
+    public BaseResponse<Object> logout(@PreAuthorize long userId) {
         userService.logout(userId);
         return new BaseResponse<>(null);
     }
