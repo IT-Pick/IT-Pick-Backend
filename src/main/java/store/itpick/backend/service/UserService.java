@@ -3,9 +3,7 @@ package store.itpick.backend.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,14 +24,14 @@ import store.itpick.backend.repository.UserRepository;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
-import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_TOKEN;
 
@@ -105,7 +103,7 @@ public class UserService {
         postUserRequest.setPassword(encodedPassword);
 
         // Create user
-        User user = User.builder().email(postUserRequest.getEmail()).password(encodedPassword).nickname(postUserRequest.getNickname()).birthDate(postUserRequest.getBirth_date()).status("active").build();
+        User user = User.builder().email(postUserRequest.getEmail()).password(encodedPassword).nickname(postUserRequest.getNickname()).birthDate(postUserRequest.getBirth_date()).status("active").alertSetting(true).createAt(Timestamp.valueOf(LocalDateTime.now())).build();
 
         user = userRepository.save(user);
 
