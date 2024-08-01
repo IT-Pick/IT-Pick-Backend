@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,14 +17,14 @@ import store.itpick.backend.common.argument_resolver.PreAuthorize;
 import store.itpick.backend.common.exception.jwt.unauthorized.JwtExpiredTokenException;
 import store.itpick.backend.common.exception.jwt.unauthorized.JwtInvalidTokenException;
 import store.itpick.backend.common.response.BaseResponse;
-import store.itpick.backend.dto.auth.*;
+import store.itpick.backend.dto.auth.LoginRequest;
+import store.itpick.backend.dto.auth.LoginResponse;
 import store.itpick.backend.dto.user.user.PostUserRequest;
 import store.itpick.backend.dto.user.user.PostUserResponse;
-import store.itpick.backend.jwt.JwtProvider;
-import store.itpick.backend.model.User;
 import store.itpick.backend.service.UserService;
 import store.itpick.backend.common.exception.UserException;
 
+import  static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_USER_VALUE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,22 +72,33 @@ public class UserController {
 
 
     @PostMapping("/signup")
-    public BaseResponse<PostUserResponse> signUp(@RequestBody PostUserRequest postUserRequest, BindingResult bindingResult) {
+    public BaseResponse<PostUserResponse> signUp(@Valid @RequestBody PostUserRequest postUserRequest, BindingResult bindingResult) {
       if(bindingResult.hasErrors()){
           throw new UserException(INVALID_USER_VALUE, getErrorMessages(bindingResult));
       }
       return new BaseResponse<>(userService.signUp(postUserRequest));
     }
 
+    @DeleteMapping("")
+    public BaseResponse<Object> modifyUserStatus_deleted(@RequestHeader("Authorization") String token) {
+        // Authorization 헤더에서 "Bearer " 부분을 제거하고 토큰만 추출
+        String accessToken = token.replace("Bearer ", "");
+        userService.modifyUserStatus_deleted(accessToken);
+        return new BaseResponse<>(HttpStatus.OK);
+    }
 
+    @PostMapping("/emails/verification-requests")
+    public BaseResponse<Object> sendMessage(@RequestParam("email") @Valid String email){
+        userService.sendCodeToEmail(email);
 
+        return new BaseResponse<>(HttpStatus.OK);
+    }
 
+    @GetMapping("/emails/verifications")
+    public BaseResponse<Object> verificationEmail(@RequestParam("email") @Valid String email,
+                                            @RequestParam("code") String authCode){
+        userService.verifiedCode(email,authCode);
 
-    @PatchMapping("/{userId}/deleted")
-    public BaseResponse<Object> modifyUserStatus_deleted(@PathVariable Long userId, @PreAuthorize long header_userId) {
-        // userId validation 추가
-        userService.validationUserId(userId, header_userId);
-        userService.modifyUserStatus_deleted(userId);
-        return new BaseResponse<>(null);
+        return new BaseResponse<>(HttpStatus.OK);
     }
 }
