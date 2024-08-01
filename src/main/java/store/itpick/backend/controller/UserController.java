@@ -19,19 +19,14 @@ import store.itpick.backend.common.exception.jwt.unauthorized.JwtInvalidTokenExc
 import store.itpick.backend.common.response.BaseResponse;
 import store.itpick.backend.dto.auth.LoginRequest;
 import store.itpick.backend.dto.auth.LoginResponse;
+import store.itpick.backend.dto.auth.RefreshRequest;
+import store.itpick.backend.dto.auth.RefreshResponse;
 import store.itpick.backend.dto.user.user.PostUserRequest;
 import store.itpick.backend.dto.user.user.PostUserResponse;
 import store.itpick.backend.service.UserService;
 import store.itpick.backend.common.exception.UserException;
 
 import  static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_USER_VALUE;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
-import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_TOKEN;
 import static store.itpick.backend.util.BindingResultUtils.getErrorMessages;
 
 @Slf4j
@@ -44,7 +39,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/refresh")
-    public BaseResponse<RefreshResponse> refresh(@Validated @RequestBody RefreshRequest  refreshRequest) {
+    public BaseResponse<RefreshResponse> refresh(@Validated @RequestBody RefreshRequest refreshRequest) {
         return new BaseResponse<>(userService.refresh(refreshRequest.getRefreshToken()));
     }
 

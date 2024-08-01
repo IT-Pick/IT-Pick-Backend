@@ -55,12 +55,6 @@ public class UserService {
     private final JwtProvider jwtProvider;
 
 
-    @Value("${secret.jwt-refresh-expired-in}")
-    private long JWT_REFRESH_EXPIRED_IN;
-
-
-
-
 
 
     public LoginResponse login(LoginRequest authRequest) {
@@ -117,9 +111,7 @@ public class UserService {
         return new PostUserResponse(user.getUserId());
     }
 
-    private void validateEmail(String email) {
-        if (userRepository.existsByEmailAndStatusIn(email, List.of("active", "dormant"))) {
-            throw new UserException(DUPLICATE_EMAIL);
+
     public RefreshResponse refresh(String refreshToken){
         // 만료 & 유효성 확인, 로그아웃 확인
         if(jwtProvider.isExpiredToken(refreshToken) || refreshToken == null || refreshToken.isEmpty()){
@@ -234,12 +226,6 @@ public class UserService {
 
     public long getUserIdByEmail(String email) {
         return userRepository.getUserByEmail(email).get().getUserId();
-    }
-
-    public void validationUserId(long userId, long header_userId) {
-        if (userId == header_userId) {
-            throw  new UserException(TOKEN_MISMATCH);
-        }
     }
 
 
