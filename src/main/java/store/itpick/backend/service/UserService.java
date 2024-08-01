@@ -28,6 +28,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
 
@@ -63,7 +64,7 @@ public class UserService {
         User user;
         try {
             user = userRepository.getUserByEmail(email).get();
-        } catch (IncorrectResultSizeDataAccessException e) {
+        } catch (NoSuchElementException e) {
             throw new UserException(EMAIL_NOT_FOUND);
         }
         long userId = user.getUserId();
@@ -139,7 +140,7 @@ public class UserService {
         User user;
         try {
             user = userRepository.getUserByUserId(userId).get();
-        } catch (IncorrectResultSizeDataAccessException e) {
+        } catch (NoSuchElementException e) {
             throw new UserException(USER_NOT_FOUND);
         }
         user.setRefreshToken(null);
