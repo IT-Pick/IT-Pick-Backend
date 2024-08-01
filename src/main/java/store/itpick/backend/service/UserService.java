@@ -24,7 +24,9 @@ import store.itpick.backend.repository.UserRepository;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -100,7 +102,7 @@ public class UserService {
         postUserRequest.setPassword(encodedPassword);
 
         // Create user
-        User user = User.builder().email(postUserRequest.getEmail()).password(encodedPassword).nickname(postUserRequest.getNickname()).birthDate(postUserRequest.getBirth_date()).status("active").build();
+        User user = User.builder().email(postUserRequest.getEmail()).password(encodedPassword).nickname(postUserRequest.getNickname()).birthDate(postUserRequest.getBirth_date()).status("active").alertSetting(true).createAt(Timestamp.valueOf(LocalDateTime.now())).build();
 
         user = userRepository.save(user);
 
