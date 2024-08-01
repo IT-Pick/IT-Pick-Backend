@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtAuthenticationInterceptor)
                 .order(1)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/auth/login", "/auth/signup", "/auth/refresh");
+                .excludePathPatterns("/auth/login", "/auth/signup", "/auth/refresh","/auth/emails/**");
                  //인터셉터 적용 범위 수정
     }
 
