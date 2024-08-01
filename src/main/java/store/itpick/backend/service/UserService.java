@@ -1,16 +1,22 @@
 package store.itpick.backend.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import store.itpick.backend.common.exception.UserException;
+import store.itpick.backend.common.exception.jwt.unauthorized.JwtExpiredTokenException;
+import store.itpick.backend.common.exception.jwt.unauthorized.JwtInvalidTokenException;
 import store.itpick.backend.common.response.status.BaseExceptionResponseStatus;
+import store.itpick.backend.dto.auth.JwtDTO;
 import store.itpick.backend.dto.auth.LoginRequest;
 import store.itpick.backend.dto.auth.LoginResponse;
+import store.itpick.backend.dto.auth.RefreshResponse;
 import store.itpick.backend.dto.user.user.PostUserRequest;
 import store.itpick.backend.dto.user.user.PostUserResponse;
 import store.itpick.backend.jwt.JwtProvider;
@@ -24,8 +30,11 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
+import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
+import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_TOKEN;
 
 
 @Slf4j
@@ -43,26 +52,35 @@ public class UserService {
     private long authCodeExpirationMillis;
     private static final String AUTH_CODE_PREFIX = "AuthCode ";
 
+    private final JwtProvider jwtProvider;
+
+
+
 
     public LoginResponse login(LoginRequest authRequest) {
 
         String email = authRequest.getEmail();
 
         // TODO: 1. 이메일 유효성 확인
-        long userId;
+        User user;
         try {
-            userId = userRepository.getUserByEmail(email).get().getUserId();
+            user = userRepository.getUserByEmail(email).get();
         } catch (IncorrectResultSizeDataAccessException e) {
             throw new UserException(EMAIL_NOT_FOUND);
         }
+        long userId = user.getUserId();
 
         // TODO: 2. 비밀번호 일치 확인
         validatePassword(authRequest.getPassword(), userId);
 
         // TODO: 3. JWT 갱신
-        String updatedJwt = jwtTokenProvider.createToken(email, userId);
+        String updatedAccessToken = jwtProvider.createToken(email, userId);
+        String updatedRefreshToken = jwtProvider.createRefreshToken(email, userId);
+        user.setRefreshToken(updatedRefreshToken);
+        userRepository.save(user);
+        JwtDTO jwtDTO = new JwtDTO(updatedAccessToken, updatedRefreshToken);
 
-        return new LoginResponse(userId, updatedJwt);
+        return new LoginResponse(userId, jwtDTO);
     }
 
     private void validatePassword(String password, long userId) {
@@ -93,16 +111,41 @@ public class UserService {
         return new PostUserResponse(user.getUserId());
     }
 
-    private void validateEmail(String email) {
-        if (userRepository.existsByEmailAndStatusIn(email, List.of("active", "dormant"))) {
-            throw new UserException(DUPLICATE_EMAIL);
+
+    public RefreshResponse refresh(String refreshToken){
+        // 만료 & 유효성 확인, 로그아웃 확인
+        if(jwtProvider.isExpiredToken(refreshToken) || refreshToken == null || refreshToken.isEmpty()){
+            throw new JwtExpiredTokenException(EXPIRED_REFRESH_TOKEN);
         }
+        String email = jwtProvider.getPrincipal(refreshToken);
+        if (email == null) {
+            throw new JwtInvalidTokenException(INVALID_TOKEN);
+        }
+
+        // 이메일 유효성 확인
+        User user;
+        try {
+            user = userRepository.getUserByEmail(email).get();
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new UserException(EMAIL_NOT_FOUND);
+        }
+        long userId = user.getUserId();
+
+        // 엑세스 토큰 재발급
+        return new RefreshResponse(jwtProvider.createToken(email, userId));
     }
 
-    private void validateNickname(String nickname) {
-        if (userRepository.existsByNicknameAndStatusIn(nickname, List.of("active", "dormant"))) {
-            throw new UserException(DUPLICATE_NICKNAME);
+    // 로그아웃
+    public void logout(long userId) {
+
+        User user;
+        try {
+            user = userRepository.getUserByUserId(userId).get();
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new UserException(USER_NOT_FOUND);
         }
+        user.setRefreshToken(null);
+        userRepository.save(user);
     }
 
     public void modifyUserStatus_deleted(String token) {
@@ -162,5 +205,28 @@ public class UserService {
             throw new UserException(BaseExceptionResponseStatus.AUTH_CODE_IS_NOT_SAME);
         }
     }
+
+
+
+
+
+
+
+    private void validateEmail(String email) {
+        if (userRepository.existsByEmailAndStatusIn(email, List.of("active", "dormant"))) {
+            throw new UserException(BaseExceptionResponseStatus.DUPLICATE_EMAIL);
+        }
+    }
+
+    private void validateNickname(String nickname) {
+        if (userRepository.existsByNicknameAndStatusIn(nickname, List.of("active", "dormant"))) {
+            throw new UserException(BaseExceptionResponseStatus.DUPLICATE_NICKNAME);
+        }
+    }
+
+    public long getUserIdByEmail(String email) {
+        return userRepository.getUserByEmail(email).get().getUserId();
+    }
+
 
 }

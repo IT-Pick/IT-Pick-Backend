@@ -5,12 +5,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import store.itpick.backend.common.argument_resolver.PreAuthorize;
+import store.itpick.backend.common.exception.jwt.unauthorized.JwtExpiredTokenException;
+import store.itpick.backend.common.exception.jwt.unauthorized.JwtInvalidTokenException;
 import store.itpick.backend.common.response.BaseResponse;
 import store.itpick.backend.dto.auth.LoginRequest;
 import store.itpick.backend.dto.auth.LoginResponse;
+import store.itpick.backend.dto.auth.RefreshRequest;
+import store.itpick.backend.dto.auth.RefreshResponse;
 import store.itpick.backend.dto.user.user.PostUserRequest;
 import store.itpick.backend.dto.user.user.PostUserResponse;
 import store.itpick.backend.service.UserService;
@@ -22,10 +32,17 @@ import static store.itpick.backend.util.BindingResultUtils.getErrorMessages;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/auth")
 public class UserController {
 
     @Autowired
     private final UserService userService;
+
+    @PostMapping("/refresh")
+    public BaseResponse<RefreshResponse> refresh(@Validated @RequestBody RefreshRequest refreshRequest) {
+        return new BaseResponse<>(userService.refresh(refreshRequest.getRefreshToken()));
+    }
+
 
     /**
      * 로그인
@@ -39,8 +56,12 @@ public class UserController {
         return new BaseResponse<>(userService.login(authRequest));
     }
 
-    @PostMapping("/logout")
-    public BaseResponse<?> logoutUser() {
+    /**
+     * 로그아웃 : db의 refresh 토큰을 null로 설정
+     */
+    @PatchMapping("/logout")
+    public BaseResponse<Object> logout(@PreAuthorize long userId) {
+        userService.logout(userId);
         return new BaseResponse<>(null);
     }
 
