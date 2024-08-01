@@ -3,9 +3,7 @@ package store.itpick.backend.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +28,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
-import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_TOKEN;
 

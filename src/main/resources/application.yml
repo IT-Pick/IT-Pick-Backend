@@ -34,9 +34,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-  h2:
-    console:
-      enabled: true
   mail:
     host: smtp.gmail.com
     port: 587
@@ -107,10 +104,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-  h2:
-    console:
-      enabled: true
-
 
 ---
 
