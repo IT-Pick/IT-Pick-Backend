@@ -13,17 +13,17 @@ spring:
       on-profile: "localDB"
 
   datasource:
-#    url: ${DATASOURCE_URL}
-#    username: ${DATASOURCE_USERNAME}
-#    password: ${DATASOURCE_PASSWORD}
-    url: jdbc:h2:tcp://localhost/~/itpick
-    username: sa
-    password:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+#    url: jdbc:h2:tcp://localhost/~/itpick
+#    username: sa
+#    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
     dbcp2:
       validation-query: select 1
     hikari:
-      driver-class-name: org.h2.Driver
+#      driver-class-name: org.h2.Driver
   sql:
     init:
       platform: mysql
