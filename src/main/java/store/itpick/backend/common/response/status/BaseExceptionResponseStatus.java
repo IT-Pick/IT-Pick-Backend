@@ -46,8 +46,11 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     PASSWORD_NO_MATCH(5004, HttpStatus.BAD_REQUEST.value(), "비밀번호가 일치하지 않습니다."),
     INVALID_USER_STATUS(5005, HttpStatus.BAD_REQUEST.value(), "잘못된 회원 status 값입니다."),
     EMAIL_NOT_FOUND(5006, HttpStatus.BAD_REQUEST.value(), "존재하지 않는 이메일입니다."),
-    INVALID_PASSWORD(5007, HttpStatus.BAD_REQUEST.value(), "유효하지 않는 password입니다.");
-
+    INVALID_PASSWORD(5007, HttpStatus.BAD_REQUEST.value(), "유효하지 않는 password입니다."),
+    UNABLE_TO_SEND_EMAIL(5008,HttpStatus.BAD_REQUEST.value(),"메일을 전송할 수 없습니다."),
+    NO_SUCH_ALGORITHM(5009, HttpStatus.BAD_REQUEST.value(), "인증 번호 생성을 위한 알고리즘을 찾을 수 없습니다."),
+    AUTH_CODE_IS_NOT_SAME(5010, HttpStatus.BAD_REQUEST.value(), "인증 번호가 일치하지 않습니다."),
+    MEMBER_EXISTS(5011,HttpStatus.BAD_REQUEST.value(), "이미 존재하는 회원입니다.");
 
     /**
      * 6000: Debate 오류

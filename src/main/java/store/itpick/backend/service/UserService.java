@@ -1,8 +1,9 @@
 package store.itpick.backend.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +18,17 @@ import store.itpick.backend.model.User;
 import store.itpick.backend.repository.UserRepository;
 
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
-import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.EMAIL_NOT_FOUND;
-import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.PASSWORD_NO_MATCH;
+import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -31,6 +36,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtTokenProvider;
+    private final MailService mailService;
+    private final RedisService redisService;
+
+    @Value("${spring.mail.auth-code-expiration-millis}")
+    private long authCodeExpirationMillis;
+    private static final String AUTH_CODE_PREFIX = "AuthCode ";
+
 
     public LoginResponse login(LoginRequest authRequest) {
 
@@ -78,32 +90,76 @@ public class UserService {
 
         user = userRepository.save(user);
 
-        // 회원가입에서 jwt 생성 시 여기에 로직 포함시키기
-        String jwt = "";
-
-        return new PostUserResponse(user.getUserId(), jwt);
+        return new PostUserResponse(user.getUserId());
     }
 
     private void validateEmail(String email) {
         if (userRepository.existsByEmailAndStatusIn(email, List.of("active", "dormant"))) {
-            throw new UserException(BaseExceptionResponseStatus.DUPLICATE_EMAIL);
+            throw new UserException(DUPLICATE_EMAIL);
         }
     }
 
     private void validateNickname(String nickname) {
         if (userRepository.existsByNicknameAndStatusIn(nickname, List.of("active", "dormant"))) {
-            throw new UserException(BaseExceptionResponseStatus.DUPLICATE_NICKNAME);
+            throw new UserException(DUPLICATE_NICKNAME);
         }
     }
 
-    public void modifyUserStatus_deleted(long userId) {
+    public void modifyUserStatus_deleted(String token) {
+        // JWT 토큰에서 사용자 ID 추출
+        Long userId = jwtTokenProvider.getUserIdFromToken(token);
+
+        // 사용자 상태를 "deleted"로 변경
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setStatus("deleted");
             userRepository.save(user);
         } else {
-            throw new UserException(BaseExceptionResponseStatus.USER_NOT_FOUND);
+            throw new UserException(USER_NOT_FOUND);
+        }
+    }
+
+    public void sendCodeToEmail(String toEmail) {
+        this.checkDuplicatedEmail(toEmail);
+        String title = "ITPICK 회원가입을 위한 이메일 인증 번호입니다.";
+        String authCode = this.createCode();
+        mailService.sendEmail(toEmail, title, authCode);
+        // 이메일 인증 요청 시 인증 번호 Redis에 저장 ( key = "AuthCode " + Email / value = AuthCode )
+        redisService.setValues(AUTH_CODE_PREFIX + toEmail,
+                authCode, Duration.ofMillis(this.authCodeExpirationMillis));
+    }
+
+    private void checkDuplicatedEmail(String email){
+        Optional<User> user = userRepository.getUserByEmail(email);
+        if(user.isPresent()){
+            log.debug("MemberServiceImpl.checkDuplicatedEmail exception occur email: {}", email);
+            throw new UserException(BaseExceptionResponseStatus.MEMBER_EXISTS);
+        }
+    }
+
+    private String createCode() {
+        int lenth = 6;
+        try {
+            Random random = SecureRandom.getInstanceStrong();
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < lenth; i++) {
+                builder.append(random.nextInt(10));
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            log.debug("MemberService.createCode() exception occur");
+            throw new UserException(BaseExceptionResponseStatus.NO_SUCH_ALGORITHM);
+        }
+    }
+
+    public void verifiedCode(String email, String authCode) {
+        this.checkDuplicatedEmail(email);
+        String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
+        boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode);
+
+        if(!authResult){
+            throw new UserException(BaseExceptionResponseStatus.AUTH_CODE_IS_NOT_SAME);
         }
     }
 
