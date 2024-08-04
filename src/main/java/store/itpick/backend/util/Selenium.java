@@ -14,6 +14,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import store.itpick.backend.model.CommunityType;
 import store.itpick.backend.model.PeriodType;
 import store.itpick.backend.model.Reference;
 
@@ -45,7 +46,7 @@ public class Selenium {
 
         // 웹드라이버 옵션 설정
         ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--headless"); // 브라우저 UI 없이 실행
+        options.addArguments("--headless"); // 브라우저 UI 없이 실행
         options.addArguments("--lang=ko");  // 브라우저 언어를 한국어로 설정
         /*
             @ 샌드박스 비활성화
@@ -127,7 +128,7 @@ public class Selenium {
             keywordList.add(keyword);
             System.out.println(keyword);
         }
-        redis.saveAll(PeriodType.BY_REAL_TIME, "zum", keywordList);
+        redis.saveAll(CommunityType.ZUM, PeriodType.BY_REAL_TIME, "240804", keywordList);
 
         // 링크 수집
         List<WebElement> webElementBySearchLink = issueLayer.findElements(By.cssSelector(".link"));
@@ -216,7 +217,7 @@ public class Selenium {
             Reference reference = new Reference(keyword, searchLink, "", "", "", "");
             references.add(reference);
         }
-        redis.saveAll(PeriodType.BY_REAL_TIME, "naver", keywordList);
+        redis.saveAll(CommunityType.NAVER, PeriodType.BY_REAL_TIME, "240804", keywordList);
         SearchReference(references);
 
 //        quitDriver();
@@ -256,7 +257,7 @@ public class Selenium {
             keywordList.add(keywords);
             System.out.println(keywords);
         }
-        redis.saveAll(PeriodType.BY_REAL_TIME, "nate", keywordList);
+        redis.saveAll(CommunityType.NATE, PeriodType.BY_REAL_TIME, "240804", keywordList);
 
         // 링크 수집
         List<WebElement> webElementBySearchLink = webElement.findElements(By.cssSelector("a"));
