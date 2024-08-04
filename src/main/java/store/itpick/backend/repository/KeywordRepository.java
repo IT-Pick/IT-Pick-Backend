@@ -1,10 +1,13 @@
 package store.itpick.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import store.itpick.backend.model.Keyword;
 
 import java.util.Optional;
 
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
-    Optional<Keyword> findByRedisIdAndKeyword(String redisId, String keyword);
+
+    /** Key랑 RedisId를 통해서 관련자료 Id를 조회하는데, 2개 이상의 Id가 조회되는 경우 가장 최신의 것을 선택 **/
+    Optional<Keyword> findFirstByRedisIdAndKeywordOrderByCreateAtDesc(String redisId, String keyword);
 }

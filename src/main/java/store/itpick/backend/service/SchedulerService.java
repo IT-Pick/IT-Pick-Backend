@@ -49,7 +49,12 @@ public class SchedulerService {
     }
 
 
-    // 1시간마다 크롤링 작업 수행
+    /**
+     * 1시간마다 크롤링 작업 수행
+     * Cron 규칙
+     * (초, 분, 시간, 일, 월, 요일) 순서
+     **/
+
     @Scheduled(cron = "0 0 * * * *")  // 매 시간 정각에 실행 (cron 표현식)
     public void CrawlingEveryHour() {
         try {
@@ -68,10 +73,16 @@ public class SchedulerService {
         }
     }
 
-    @Scheduled(cron = "0 0 * * * *")  // 매 시간 정각에 실행 (cron 표현식)
+    @Scheduled(cron = "0 0 18 * * *")  // 매일 18시 정각에 실행
     public void CrawlingEveryDay() {
-
-
+        // 작업 구현
     }
+
+
+    @Scheduled(cron = "0 0 18 * * MON")  // 매주 월요일 18시에 실행
+    public void CrawlingEveryWeek() {
+        // 작업 구현
+    }
+
 
 }

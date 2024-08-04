@@ -17,7 +17,7 @@ public class RankService {
     private KeywordRepository keywordRepository;
 
     public RankResponseDTO getReferenceByKeyword(String key, String keyword) {
-        Optional<Keyword> keywordEntityOptional = keywordRepository.findByRedisIdAndKeyword(key, keyword);
+        Optional<Keyword> keywordEntityOptional = keywordRepository.findFirstByRedisIdAndKeywordOrderByCreateAtDesc(key, keyword);
 
         if (keywordEntityOptional.isPresent()) {
             Keyword keywordEntity = keywordEntityOptional.get();
