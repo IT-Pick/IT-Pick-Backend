@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import store.itpick.backend.util.Selenium;
 
 import java.io.IOException;
 
@@ -16,9 +15,6 @@ public class TestController {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
-
-    @Autowired
-    private Selenium selenium;
 
     @GetMapping("/test-redis")
     public String testRedis() {
@@ -35,14 +31,14 @@ public class TestController {
         System.out.println(elements);
     }
 
-    @GetMapping("/test/selenium")
-    public String seleniumTest() {
-        String url = "https://trends.google.com/trends/trendingsearches/daily?geo=KR&hl=ko";
-//        String cssSelector = ".summary-text > a";
-        String cssSelector = ".details-top > div > span";
-
-        return selenium.useDriver(url, cssSelector);
-    }
+//    @GetMapping("/test/selenium")
+//    public String seleniumTest() {
+//        String url = "https://trends.google.com/trends/trendingsearches/daily?geo=KR&hl=ko";
+////        String cssSelector = ".summary-text > a";
+//        String cssSelector = ".details-top > div > span";
+//
+//        return selenium.useDriver(url, cssSelector);
+//    }
 
     @GetMapping("/*.ico")
     void pathMatch() {

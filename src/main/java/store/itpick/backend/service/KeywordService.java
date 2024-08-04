@@ -14,6 +14,7 @@ public class KeywordService {
 
     private final KeywordRepository keywordRepository;
 
+    //keyword 저장함
     @Transactional
     public void saveAll(List<Keyword> keywords) {
         keywordRepository.saveAll(keywords);

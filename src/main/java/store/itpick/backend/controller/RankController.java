@@ -11,7 +11,7 @@ import store.itpick.backend.common.response.BaseResponse;
 import store.itpick.backend.dto.rank.RankResponseDTO;
 import store.itpick.backend.model.Reference;
 import store.itpick.backend.service.RankService;
-import store.itpick.backend.util.Selenium;
+import store.itpick.backend.service.SeleniumService;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -30,10 +30,8 @@ public class RankController {
     }
 
     @Autowired
-    private Selenium selenium;
+    private SeleniumService seleniumService;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
 
     // 최대 재시도 횟수와 재시도 간격 (초)
     private static final int MAX_RETRIES = 5;
@@ -67,13 +65,13 @@ public class RankController {
     @GetMapping("/zum")
     public List<Reference> getRankFromZum() {
         String url = "https://zum.com/";
-        return executeWithRetries(() -> selenium.useDriverForZum(url), "Zum 데이터 수집");
+        return executeWithRetries(() -> seleniumService.useDriverForZum(url), "Zum 데이터 수집");
     }
 
     @GetMapping("/namu")
     public String getRankFromNamuwiki() {
         String url = "https://namu.wiki/";
-        return executeWithRetries(() -> selenium.useDriverForNamuwiki(url), "Namuwiki 데이터 수집");
+        return executeWithRetries(() -> seleniumService.useDriverForNamuwiki(url), "Namuwiki 데이터 수집");
     }
 
 
@@ -88,13 +86,13 @@ public class RankController {
     @GetMapping("/naver")
     public List<Reference> getRankFromSignal() {
         String url = "https://www.signal.bz/";
-        return executeWithRetries(() -> selenium.useDriverForNaver(url), "Signal 데이터 수집");
+        return executeWithRetries(() -> seleniumService.useDriverForNaver(url), "Signal 데이터 수집");
     }
 
     @GetMapping("/mnate")
     public List<Reference> getRankFromMnate() {
         String url = "https://m.nate.com/";
-        return executeWithRetries(() -> selenium.useDriverForMnate(url), "Mnate 데이터 수집");
+        return executeWithRetries(() -> seleniumService.useDriverForMnate(url), "Mnate 데이터 수집");
     }
 
 //    @GetMapping("/nate")
