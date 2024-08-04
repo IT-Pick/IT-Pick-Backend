@@ -28,7 +28,7 @@ public class Redis {
 //        redisTemplate.expire(key, Duration.ofSeconds(20));
 //    }
 
-    public void saveAll(PeriodType periodType, String community, List<String> keywordList) {
+    public String saveAll(PeriodType periodType, String community, List<String> keywordList) {
         ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
         String key = makeKey(community, periodType);
 
@@ -37,6 +37,8 @@ public class Redis {
             zSetOperations.add(key, keywordList.get(rank - 1), rank);
         }
 //        redisTemplate.expire(key, Duration.ofSeconds(20));
+
+        return key;
     }
 
     private static String makeKey(String community, PeriodType periodType) {
