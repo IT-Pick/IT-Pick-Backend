@@ -1,14 +1,14 @@
-package store.itpick.backend.scheduler;
+package store.itpick.backend.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.TimeoutException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import store.itpick.backend.model.Reference;
-import store.itpick.backend.service.SeleniumService;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalTime;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +18,8 @@ import java.util.concurrent.TimeUnit;
 public class SchedulerService {
 
     private final SeleniumService seleniumService;
+    private final KeywordService keywordService;
+
 
     // 최대 재시도 횟수와 재시도 간격 (초)
     private static final int MAX_RETRIES = 5;
@@ -29,19 +31,20 @@ public class SchedulerService {
             try {
                 return action.call(); // 작업 시도
             } catch (TimeoutException e) {
-                System.out.println(actionName + " 시도 중 TimeoutException 발생, 재시도 중... (" + (attempt + 1) + "/" + MAX_RETRIES + ")");
+                log.warn("{} 시도 중 TimeoutException 발생, 재시도 중... ({}/{})", actionName, attempt + 1, MAX_RETRIES);
                 if (attempt == MAX_RETRIES - 1) {
-                    System.out.println("모든 " + actionName + " 시도 실패. 종료합니다.");
+                    log.error("모든 {} 시도 실패. 종료합니다.", actionName);
                     return null;
                 }
                 try {
                     TimeUnit.SECONDS.sleep(RETRY_DELAY_SECONDS);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
+                    log.error("재시도 지연 중 InterruptedException 발생: {}", ie.getMessage());
                     return null;
                 }
             } catch (Exception e) {
-                System.out.println(actionName + " 작업 중 예기치 않은 오류 발생: " + e.getMessage());
+                log.error("{} 작업 중 예기치 않은 오류 발생: {}", actionName, e.getMessage());
                 break;
             }
         }
@@ -49,40 +52,52 @@ public class SchedulerService {
     }
 
 
-    /**
-     * 1시간마다 크롤링 작업 수행
-     * Cron 규칙
-     * (초, 분, 시간, 일, 월, 요일) 순서
-     **/
 
-    @Scheduled(cron = "0 0 * * * *")  // 매 시간 정각에 실행 (cron 표현식)
-    public void CrawlingEveryHour() {
+    // 매 시간마다 실행하는 작업
+    @Scheduled(cron = "0 0 * * * *")
+    public void performScheduledTasks() {
+        log.info("Starting scheduled tasks...");
+        if (isDailyTaskTime()) {
+            performDailyTasks();
+        } else {
+            performHourlyTasks();
+        }
+        log.info("Scheduled tasks completed.");
+    }
+
+    private boolean isDailyTaskTime() {
+        LocalTime now = LocalTime.now();
+        return now.getHour() == 18 && now.getMinute() == 0;
+    }
+
+    // 시간별 크롤링 작업
+    private void performHourlyTasks() {
         try {
-            log.info("Starting scheduled crawling task...");
-
-
             executeWithRetries(() -> seleniumService.useDriverForZum("https://zum.com/"), "Zum 데이터 수집");
             executeWithRetries(() -> seleniumService.useDriverForMnate("https://m.nate.com/"), "Mnate 데이터 수집");
             executeWithRetries(() -> seleniumService.useDriverForNaver("https://www.signal.bz/"), "Naver 데이터 수집");
-
-            log.info("Scheduled crawling task completed.");
         } catch (Exception e) {
-            log.error("Error during scheduled crawling task", e);
+            log.error("Error during hourly task", e);
         } finally {
             seleniumService.quitDriver();  // 작업 후 드라이버 종료
         }
     }
 
-    @Scheduled(cron = "0 0 18 * * *")  // 매일 18시 정각에 실행
-    public void CrawlingEveryDay() {
-        // 작업 구현
+    //18시에 하는 DB작업
+    private void performDailyTasks() {
+        log.info("Starting scheduled tasks...performing DailyTask");
+        performHourlyTasks(); // 매일 18시에 hourlyTask를 포함
+        // Daily task 로직
+        keywordService.performDailyTasks();
+        log.info("Scheduled tasks completed DailyTask.");
+
     }
 
-
+    // 매주 월요일 18시에 실행하는 작업
     @Scheduled(cron = "0 0 18 * * MON")  // 매주 월요일 18시에 실행
-    public void CrawlingEveryWeek() {
-        // 작업 구현
+    public void weeklyTask() {
+        log.info("Starting weekly task...");
+        // Weekly 작업 로직 추가
+        log.info("Weekly task completed.");
     }
-
-
 }
