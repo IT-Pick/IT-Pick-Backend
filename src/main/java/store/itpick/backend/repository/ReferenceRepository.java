@@ -1,4 +1,7 @@
 package store.itpick.backend.repository;
 
-public interface ReferenceRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import store.itpick.backend.model.Reference;
+
+public interface ReferenceRepository extends JpaRepository<Reference, Long> {
 }
