@@ -11,9 +11,12 @@ import store.itpick.backend.common.response.BaseResponse;
 import store.itpick.backend.common.response.status.ResponseStatus;
 import store.itpick.backend.model.CommunityType;
 import store.itpick.backend.model.PeriodType;
+import store.itpick.backend.dto.rank.RankResponseDTO;
 import store.itpick.backend.model.Reference;
 import store.itpick.backend.util.Redis;
 import store.itpick.backend.util.Selenium;
+import store.itpick.backend.service.RankService;
+import store.itpick.backend.service.SeleniumService;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -25,11 +28,20 @@ import static store.itpick.backend.common.response.status.BaseExceptionResponseS
 @RequestMapping("/rank")
 public class RankController {
 
+
+    private final RankService rankService;
+
     @Autowired
-    private Selenium selenium;
+    public RankController(RankService rankService) {
+        this.rankService = rankService;
+    }
+
+    @Autowired
+    private SeleniumService seleniumService;
 
     @Autowired
     private Redis redis;
+
 
     // 최대 재시도 횟수와 재시도 간격 (초)
     private static final int MAX_RETRIES = 1;
@@ -63,25 +75,34 @@ public class RankController {
     @GetMapping("/zum")
     public List<Reference> getRankFromZum() {
         String url = "https://zum.com/";
-        return executeWithRetries(() -> selenium.useDriverForZum(url), "Zum 데이터 수집");
+        return executeWithRetries(() -> seleniumService.useDriverForZum(url), "Zum 데이터 수집");
     }
 
     @GetMapping("/namu")
     public String getRankFromNamuwiki() {
         String url = "https://namu.wiki/";
-        return executeWithRetries(() -> selenium.useDriverForNamuwiki(url), "Namuwiki 데이터 수집");
+        return executeWithRetries(() -> seleniumService.useDriverForNamuwiki(url), "Namuwiki 데이터 수집");
     }
 
-    @GetMapping("/signal")
+
+
+
+    @GetMapping
+    public BaseResponse<RankResponseDTO> getRank(@RequestParam String key, @RequestParam String keyword) {
+        RankResponseDTO rankResponse = rankService.getReferenceByKeyword(key, keyword);
+        return new BaseResponse<>(rankResponse);
+    }
+
+    @GetMapping("/naver")
     public List<Reference> getRankFromSignal() {
         String url = "https://www.signal.bz/";
-        return executeWithRetries(() -> selenium.useDriverForNaver(url), "Signal 데이터 수집");
+        return executeWithRetries(() -> seleniumService.useDriverForNaver(url), "Signal 데이터 수집");
     }
 
     @GetMapping("/mnate")
     public List<Reference> getRankFromMnate() {
         String url = "https://m.nate.com/";
-        return executeWithRetries(() -> selenium.useDriverForMnate(url), "Mnate 데이터 수집");
+        return executeWithRetries(() -> seleniumService.useDriverForMnate(url), "Mnate 데이터 수집");
     }
 
     @GetMapping("")

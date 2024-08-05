@@ -34,7 +34,7 @@ public class Redis {
 //        redisTemplate.expire(key, Duration.ofSeconds(20));
 //    }
 
-    public void saveRealtime(CommunityType communityType, PeriodType periodType, List<String> keywordList) {
+    public String saveRealtime(CommunityType communityType, PeriodType periodType, List<String> keywordList) {
         ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
         String key = makeKey(communityType, periodType, "not needed");
 
@@ -45,6 +45,8 @@ public class Redis {
             zSetOperations.add(key, keywordList.get(i), score);
         }
 //        redisTemplate.expire(key, Duration.ofSeconds(20));
+
+        return key;
     }
 
     public void saveDay() {
