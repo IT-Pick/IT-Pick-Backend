@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum RankingWeight {
-    NAVER(50),
-    NATE(30),
-    ZUM(20);
+    NAVER(5),
+    NATE(3),
+    ZUM(2);
 
     private final int rankingWeight;
 

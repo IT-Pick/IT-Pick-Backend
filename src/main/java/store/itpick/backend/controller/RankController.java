@@ -32,7 +32,7 @@ public class RankController {
     private Redis redis;
 
     // 최대 재시도 횟수와 재시도 간격 (초)
-    private static final int MAX_RETRIES = 5;
+    private static final int MAX_RETRIES = 1;
     private static final int RETRY_DELAY_SECONDS = 5;
 
     // 재시도 로직을 포함한 함수
@@ -93,6 +93,23 @@ public class RankController {
             return new BaseErrorResponse(BAD_REQUEST);
         }
         return new BaseResponse<>(redis.getRankingList(communityType, periodType, date));
+    }
+
+    @GetMapping("/day/test")
+    public void dayTest() {
+        redis.saveDay();
+    }
+
+    @GetMapping("/week/test")
+    public void weekTest() {
+        redis.saveWeek();
+    }
+
+    @GetMapping("/total/test")
+    public void totalTest() {
+        redis.saveTotalRanking(PeriodType.BY_REAL_TIME);
+        redis.saveTotalRanking(PeriodType.BY_DAY);
+        redis.saveTotalRanking(PeriodType.BY_WEEK);
     }
 
     private static boolean isValidatedDate(PeriodType periodType, String date) {

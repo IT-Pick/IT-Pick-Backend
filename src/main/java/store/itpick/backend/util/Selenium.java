@@ -46,7 +46,7 @@ public class Selenium {
 
         // 웹드라이버 옵션 설정
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless"); // 브라우저 UI 없이 실행
+//        options.addArguments("--headless"); // 브라우저 UI 없이 실행
         options.addArguments("--lang=ko");  // 브라우저 언어를 한국어로 설정
         /*
             @ 샌드박스 비활성화
@@ -100,21 +100,27 @@ public class Selenium {
         Actions actions = new Actions(driver);
 
         try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
             WebElement btn = driver.findElement(By.className("btn-layer-close-day"));
             actions.click(btn).perform();
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException ignored) {
         }
 
         WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_wrap")));
         actions.moveToElement(webElement).perform();
 
-        // 묵시적 대기
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+//        // 묵시적 대기
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
         WebElement issueLayer = new WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_layer")));
 
@@ -128,7 +134,7 @@ public class Selenium {
             keywordList.add(keyword);
             System.out.println(keyword);
         }
-        redis.saveAll(CommunityType.ZUM, PeriodType.BY_REAL_TIME, "240804", keywordList);
+        redis.saveRealtime(CommunityType.ZUM, PeriodType.BY_REAL_TIME, keywordList);
 
         // 링크 수집
         List<WebElement> webElementBySearchLink = issueLayer.findElements(By.cssSelector(".link"));
@@ -204,6 +210,12 @@ public class Selenium {
     public List<Reference> useDriverForNaver(String url) {
         driver.get(url);
 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         List<WebElement> webElementListByLink = driver.findElements(By.cssSelector(".rank-layer"));
         List<Reference> references = new ArrayList<>();
         List<String> keywordList = new ArrayList<>();
@@ -217,7 +229,7 @@ public class Selenium {
             Reference reference = new Reference(keyword, searchLink, "", "", "", "");
             references.add(reference);
         }
-        redis.saveAll(CommunityType.NAVER, PeriodType.BY_REAL_TIME, "240804", keywordList);
+        redis.saveRealtime(CommunityType.NAVER, PeriodType.BY_REAL_TIME, keywordList);
         SearchReference(references);
 
 //        quitDriver();
@@ -228,6 +240,12 @@ public class Selenium {
     public List<Reference> useDriverForMnate(String url) {
         driver.get(url);
         Actions actions = new Actions(driver);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         WebElement btn = new WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.visibilityOfElementLocated(By.className("btn_open")));
@@ -257,7 +275,7 @@ public class Selenium {
             keywordList.add(keywords);
             System.out.println(keywords);
         }
-        redis.saveAll(CommunityType.NATE, PeriodType.BY_REAL_TIME, "240804", keywordList);
+        redis.saveRealtime(CommunityType.NATE, PeriodType.BY_REAL_TIME, keywordList);
 
         // 링크 수집
         List<WebElement> webElementBySearchLink = webElement.findElements(By.cssSelector("a"));
