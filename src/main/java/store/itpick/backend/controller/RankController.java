@@ -14,7 +14,6 @@ import store.itpick.backend.model.PeriodType;
 import store.itpick.backend.dto.rank.RankResponseDTO;
 import store.itpick.backend.model.Reference;
 import store.itpick.backend.util.Redis;
-import store.itpick.backend.util.Selenium;
 import store.itpick.backend.service.RankService;
 import store.itpick.backend.service.SeleniumService;
 
@@ -87,7 +86,7 @@ public class RankController {
 
 
 
-    @GetMapping
+    @GetMapping("/reference")
     public BaseResponse<RankResponseDTO> getRank(@RequestParam String key, @RequestParam String keyword) {
         RankResponseDTO rankResponse = rankService.getReferenceByKeyword(key, keyword);
         return new BaseResponse<>(rankResponse);

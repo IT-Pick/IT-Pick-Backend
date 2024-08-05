@@ -39,11 +39,6 @@ public class SeleniumService {
     private WebDriver driver;
     private final SeleniumUtil seleniumUtil;
 
-    private final static String WEB_DRIVER_ID = "webdriver.chrome.driver"; // Properties 설정
-
-    @Value("${web-driver.path}")
-    private String WEB_DRIVER_PATH;
-
     private final Redis redis;
 
     private final KeywordService keywordService;
