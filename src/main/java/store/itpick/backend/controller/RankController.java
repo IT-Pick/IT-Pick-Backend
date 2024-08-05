@@ -9,10 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 import store.itpick.backend.model.Reference;
 <<<<<<< HEAD
 import store.itpick.backend.service.RankService;
+<<<<<<< HEAD
 import store.itpick.backend.service.SeleniumService;
 =======
 import store.itpick.backend.util.Selenium;
 >>>>>>> parent of 274194d (feat : DTO추가, 데이터베이스 접근하여 keyword, reference 접근)
+=======
+import store.itpick.backend.util.Selenium;
+>>>>>>> parent of 98bd250 (refactor : Selenium -> SeleniumService, SeleniumUtil로 분리)
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -23,8 +27,10 @@ import java.util.concurrent.TimeUnit;
 public class RankController {
 
     @Autowired
-    private SeleniumService seleniumService;
+    private Selenium selenium;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     // 최대 재시도 횟수와 재시도 간격 (초)
     private static final int MAX_RETRIES = 5;
@@ -58,25 +64,25 @@ public class RankController {
     @GetMapping("/zum")
     public List<Reference> getRankFromZum() {
         String url = "https://zum.com/";
-        return executeWithRetries(() -> seleniumService.useDriverForZum(url), "Zum 데이터 수집");
+        return executeWithRetries(() -> selenium.useDriverForZum(url), "Zum 데이터 수집");
     }
 
     @GetMapping("/namu")
     public String getRankFromNamuwiki() {
         String url = "https://namu.wiki/";
-        return executeWithRetries(() -> seleniumService.useDriverForNamuwiki(url), "Namuwiki 데이터 수집");
+        return executeWithRetries(() -> selenium.useDriverForNamuwiki(url), "Namuwiki 데이터 수집");
     }
 
     @GetMapping("/signal")
     public List<Reference> getRankFromSignal() {
         String url = "https://www.signal.bz/";
-        return executeWithRetries(() -> seleniumService.useDriverForNaver(url), "Signal 데이터 수집");
+        return executeWithRetries(() -> selenium.useDriverForNaver(url), "Signal 데이터 수집");
     }
 
     @GetMapping("/mnate")
     public List<Reference> getRankFromMnate() {
         String url = "https://m.nate.com/";
-        return executeWithRetries(() -> seleniumService.useDriverForMnate(url), "Mnate 데이터 수집");
+        return executeWithRetries(() -> selenium.useDriverForMnate(url), "Mnate 데이터 수집");
     }
 
 //    @GetMapping("/nate")

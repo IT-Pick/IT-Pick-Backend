@@ -14,7 +14,6 @@ public class ReferenceService {
 
     private final ReferenceRepository referenceRepository;
 
-    //관련자료들 List들을 저장함
     @Transactional
     public void saveAll(List<Reference> references) {
         referenceRepository.saveAll(references);

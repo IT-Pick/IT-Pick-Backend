@@ -9,8 +9,6 @@ import store.itpick.backend.repository.KeywordRepository;
 
 import java.util.Optional;
 
-
-//관련자료 조회하는 Service
 @Service
 public class RankService {
     @Autowired
