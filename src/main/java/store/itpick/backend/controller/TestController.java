@@ -1,21 +1,33 @@
 package store.itpick.backend.controller;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import store.itpick.backend.util.Selenium;
 
+import java.io.IOException;
 
 @RestController
 public class TestController {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of 05b5706 (refactor : Google Trend및 사용하지 않는 파일 제거)
 
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+<<<<<<< HEAD
     @Autowired
     private Selenium selenium;
 
+=======
+>>>>>>> parent of 05b5706 (refactor : Google Trend및 사용하지 않는 파일 제거)
     @GetMapping("/test-redis")
     public String testRedis() {
         // Redis에 값을 저장하고 다시 가져와서 확인
@@ -31,6 +43,7 @@ public class TestController {
         System.out.println(elements);
     }
 
+<<<<<<< HEAD
     @GetMapping("/test/selenium")
     public String seleniumTest() {
         String url = "https://trends.google.com/trends/trendingsearches/daily?geo=KR&hl=ko";
@@ -41,6 +54,17 @@ public class TestController {
     }
 
 >>>>>>> parent of 98bd250 (refactor : Selenium -> SeleniumService, SeleniumUtil로 분리)
+=======
+//    @GetMapping("/test/selenium")
+//    public String seleniumTest() {
+//        String url = "https://trends.google.com/trends/trendingsearches/daily?geo=KR&hl=ko";
+////        String cssSelector = ".summary-text > a";
+//        String cssSelector = ".details-top > div > span";
+//
+//        return selenium.useDriver(url, cssSelector);
+//    }
+
+>>>>>>> parent of 05b5706 (refactor : Google Trend및 사용하지 않는 파일 제거)
     @GetMapping("/*.ico")
     void pathMatch() {
         System.out.println("favicon.ico.");
