@@ -5,13 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import store.itpick.backend.common.response.BaseResponse;
-import store.itpick.backend.dto.rank.RankResponseDTO;
 import store.itpick.backend.model.Reference;
+<<<<<<< HEAD
 import store.itpick.backend.service.RankService;
 import store.itpick.backend.service.SeleniumService;
+=======
+import store.itpick.backend.util.Selenium;
+>>>>>>> parent of 274194d (feat : DTO추가, 데이터베이스 접근하여 keyword, reference 접근)
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -20,14 +21,6 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/rank")
 public class RankController {
-
-
-    private final RankService rankService;
-
-    @Autowired
-    public RankController(RankService rankService) {
-        this.rankService = rankService;
-    }
 
     @Autowired
     private SeleniumService seleniumService;
@@ -74,16 +67,7 @@ public class RankController {
         return executeWithRetries(() -> seleniumService.useDriverForNamuwiki(url), "Namuwiki 데이터 수집");
     }
 
-
-
-
-    @GetMapping
-    public BaseResponse<RankResponseDTO> getRank(@RequestParam String key, @RequestParam String keyword) {
-        RankResponseDTO rankResponse = rankService.getReferenceByKeyword(key, keyword);
-        return new BaseResponse<>(rankResponse);
-    }
-
-    @GetMapping("/naver")
+    @GetMapping("/signal")
     public List<Reference> getRankFromSignal() {
         String url = "https://www.signal.bz/";
         return executeWithRetries(() -> seleniumService.useDriverForNaver(url), "Signal 데이터 수집");

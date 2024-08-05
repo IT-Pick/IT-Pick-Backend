@@ -12,17 +12,18 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import store.itpick.backend.model.Keyword;
 import store.itpick.backend.model.PeriodType;
 import store.itpick.backend.model.Reference;
+<<<<<<< HEAD:src/main/java/store/itpick/backend/service/SeleniumService.java
 import store.itpick.backend.repository.KeywordRepository;
 import store.itpick.backend.service.KeywordService;
 import store.itpick.backend.service.ReferenceService;
 import store.itpick.backend.util.Redis;
 import store.itpick.backend.util.SeleniumUtil;
+=======
+>>>>>>> parent of 274194d (feat : DTO추가, 데이터베이스 접근하여 keyword, reference 접근):src/main/java/store/itpick/backend/util/Selenium.java
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -44,10 +45,6 @@ public class SeleniumService {
     private String WEB_DRIVER_PATH;
 
     private final Redis redis;
-
-    private final KeywordService keywordService;
-    private final ReferenceService referenceService;
-
 
     // ChromeDriver 연결 (WEB_DRIVER_PATH 값 주입되고 사용해야 하므로 PostConstruct)
     @PostConstruct
@@ -81,6 +78,7 @@ public class SeleniumService {
                 .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_layer")));
 
         // 키워드 수집
+        List<Reference> references = new ArrayList<>();
         List<WebElement> webElementByKeyword = issueLayer.findElements(By.className("inner_txt"));
         List<String> keywordList = new ArrayList<>();
         for (WebElement element : webElementByKeyword) {
@@ -89,8 +87,7 @@ public class SeleniumService {
             keywordList.add(keyword);
             System.out.println(keyword);
         }
-
-        String redisKey=redis.saveAll(PeriodType.BY_REAL_TIME, "zum", keywordList);
+        redis.saveAll(PeriodType.BY_REAL_TIME, "zum", keywordList);
 
         // 링크 수집
         List<WebElement> webElementBySearchLink = issueLayer.findElements(By.cssSelector(".link"));
@@ -101,165 +98,18 @@ public class SeleniumService {
             System.out.println(searchLink);
         }
 
-        processKeywordsAndReferences(redisKey, keywordList, linksList);
-
-
-//        quitDriver();
-        return null;
-    }
-
-
-
-    public List<Reference> useDriverForNaver(String url) {
-        driver.get(url);
-
-        List<WebElement> webElementListByLink = driver.findElements(By.cssSelector(".rank-layer"));
-
-        //키워드 수집 List
-        List<String> keywordList = new ArrayList<>();
-        //링크 수집 List
-        List<String> linksList = new ArrayList<>();
-
-        for (WebElement element : webElementListByLink) {
-            String searchLink = element.getAttribute("href");
-            WebElement titleElement = element.findElement(By.cssSelector(".rank-text"));
-            String keyword = titleElement.getText();
-            keywordList.add(keyword);   //키워드 추가
-            linksList.add(searchLink);  //링크 추가
-
-//            Reference reference = new Reference(keyword, searchLink, "", "", "", "");
-//            references.add(reference);
-        }
-        String redisKey= redis.saveAll(PeriodType.BY_REAL_TIME, "naver", keywordList);
-
-        processKeywordsAndReferences(redisKey, keywordList, linksList);
-
-
-//        quitDriver();
-        return null;
-    }
-
-    public List<Reference> useDriverForMnate(String url) {
-        driver.get(url);
-        Actions actions = new Actions(driver);
-
-        WebElement btn = new WebDriverWait(driver, Duration.ofSeconds(5))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.className("btn_open")));
-        actions.click(btn).perform();
-
-        WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(5))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.className("rankList")));
-
-        // 키워드 수집
-        List<WebElement> webElementByKeyword = webElement.findElements(By.className("kw"));
-        List<String> keywordList = new ArrayList<>();
-        for (int i = 0; i < webElementByKeyword.size(); i++) {
-            WebElement element = webElementByKeyword.get(i);
-            String keyword = element.getText();
-
-            // 문자열 맨 앞 1개 문자 제거
-            if (!keyword.isEmpty()) {
-                keyword = keyword.substring(1);
-            }
-
-            // 마지막 루프에서는 맨 앞 2개 문자 제거
-            if (i == webElementByKeyword.size() - 1 && keyword.length() > 1) {
-                keyword = keyword.substring(1);
-            }
-
-            keywordList.add(keyword);
-            System.out.println(keyword);
-        }
-
-
-
-        String redisKey=  redis.saveAll(PeriodType.BY_REAL_TIME, "nate", keywordList);
-
-        // 링크 수집
-        List<WebElement> webElementBySearchLink = webElement.findElements(By.cssSelector("a"));
-        List<String> linksList = new ArrayList<>();
-        for (WebElement element : webElementBySearchLink) {
-            String searchLink = element.getAttribute("href");
-            linksList.add(searchLink);
-            System.out.println(searchLink);
-        }
-
-        processKeywordsAndReferences(redisKey, keywordList, linksList);
-
-
-//        quitDriver();
-        return null;
-    }
-
-    private List<Reference> SearchReference(List<Keyword> keywords, List<String> linksList ) {
-        List<Reference> references=new ArrayList<>();
-        int i=0;
-        for (Keyword keyword : keywords) {
-            String searchLink=linksList.get(i++);
-            String documentTitle = keyword.getKeyword();
-            // Google 뉴스 검색 URL 생성
-            String naverSearchUrl = null;
-            try {
-                naverSearchUrl = "https://search.naver.com/search.naver?where=news&query=" + URLEncoder.encode(documentTitle, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
-            driver.get(naverSearchUrl);
-
-            try {
-                // 검색 결과 페이지에서 첫 번째 링크 추출
-                WebElement webElement = driver.findElement(By.cssSelector(".news_contents"));
-
-                String newsTitle = webElement.findElement(By.cssSelector(".news_tit")).getText();
-
-                String newsContent = webElement.findElement(By.cssSelector(".news_dsc")).getText();
-
-                String newsLink = webElement.findElement(By.cssSelector(".news_tit")).getAttribute("href");
-
-                String imageUrl = webElement.findElement(By.cssSelector(".thumb")).getAttribute("src");
-
-                Reference reference=new Reference();
-
-                reference.setNewsTitle(newsTitle);
-                reference.setNewsContent(newsContent);
-                reference.setNewsLink(newsLink);
-                reference.setNewsImage(imageUrl);
-                reference.setSearchLink(searchLink);
-
-                references.add(reference);
-            }catch (NoSuchElementException e){
-                System.out.println("검색 결과가 없습니다");
-                Reference reference=new Reference();
-
-                reference.setNewsTitle("No search");
-                reference.setNewsContent("No search");
-                reference.setNewsLink("No search");
-                reference.setNewsImage("No search");
-                reference.setSearchLink("No search");
-
-                references.add(reference);
-
-            }
-
-        }
-
-        return references;
-    }
-
-    // 키워드 및 참조를 처리하는 공통 메서드
-    private void processKeywordsAndReferences(String redisKey, List<String> keywordList, List<String> linksList) {
-        // Keyword 객체 생성
-        List<Keyword> keywords = new ArrayList<>();
+        // 키워드와 링크를 매칭하여 resourceList에 추가
         int size = Math.min(keywordList.size(), linksList.size());
         for (int i = 0; i < size; i++) {
-            String keywordContent = keywordList.get(i);
-            Keyword keyword = new Keyword();
-            keyword.setKeyword(keywordContent);
-            keyword.setRedisId(redisKey); // Redis 키 추가
+            String keyword = keywordList.get(i);
+            String link = linksList.get(i);
 
-            keywords.add(keyword);
+            Reference reference = new Reference(keyword, link, "", "", "", "");
+            references.add(reference);
         }
+        SearchReference(references);
 
+<<<<<<< HEAD:src/main/java/store/itpick/backend/service/SeleniumService.java
         // Reference 객체 검색
         List<Reference> references = SearchReference(keywords, linksList);
 
@@ -289,6 +139,12 @@ public class SeleniumService {
      나무위키 크롤링
      **/
 
+=======
+//        quitDriver();
+        return references;
+    }
+
+>>>>>>> parent of 274194d (feat : DTO추가, 데이터베이스 접근하여 keyword, reference 접근):src/main/java/store/itpick/backend/util/Selenium.java
     public String useDriverForNamuwiki(String url) {
         driver.get(url);
 
@@ -326,8 +182,136 @@ public class SeleniumService {
         return null;
     }
 
+//    public String useDriverForSignal(String url) {
+//        driver.get(url);
+//
+//        WebElement webElement = driver.findElement(By.className("realtime-rank"));
+//        System.out.println(webElement.getText());
+//
+//        quitDriver();
+//        return null;
+//    }
+
+    public List<Reference> useDriverForNaver(String url) {
+        driver.get(url);
+
+        List<WebElement> webElementListByLink = driver.findElements(By.cssSelector(".rank-layer"));
+        List<Reference> references = new ArrayList<>();
+        List<String> keywordList = new ArrayList<>();
+
+        for (WebElement element : webElementListByLink) {
+            String searchLink = element.getAttribute("href");
+            WebElement titleElement = element.findElement(By.cssSelector(".rank-text"));
+            String keyword = titleElement.getText();
+            keywordList.add(keyword);
+
+            Reference reference = new Reference(keyword, searchLink, "", "", "", "");
+            references.add(reference);
+        }
+        redis.saveAll(PeriodType.BY_REAL_TIME, "naver", keywordList);
+        SearchReference(references);
+
+//        quitDriver();
+
+        return references;
+    }
+
+    public List<Reference> useDriverForMnate(String url) {
+        driver.get(url);
+        Actions actions = new Actions(driver);
+
+        WebElement btn = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.className("btn_open")));
+        actions.click(btn).perform();
+
+        WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.className("rankList")));
+
+        // 키워드 수집
+        List<Reference> references = new ArrayList<>();
+        List<WebElement> webElementByKeyword = webElement.findElements(By.className("kw"));
+        List<String> keywordList = new ArrayList<>();
+        for (int i = 0; i < webElementByKeyword.size(); i++) {
+            WebElement element = webElementByKeyword.get(i);
+            String keywords = element.getText();
+
+            // 문자열 맨 앞 1개 문자 제거
+            if (!keywords.isEmpty()) {
+                keywords = keywords.substring(1);
+            }
+
+            // 마지막 루프에서는 맨 앞 2개 문자 제거
+            if (i == webElementByKeyword.size() - 1 && keywords.length() > 1) {
+                keywords = keywords.substring(1);
+            }
+
+            keywordList.add(keywords);
+            System.out.println(keywords);
+        }
+        redis.saveAll(PeriodType.BY_REAL_TIME, "nate", keywordList);
+
+        // 링크 수집
+        List<WebElement> webElementBySearchLink = webElement.findElements(By.cssSelector("a"));
+        List<String> linksList = new ArrayList<>();
+        for (WebElement element : webElementBySearchLink) {
+            String searchLink = element.getAttribute("href");
+            linksList.add(searchLink);
+            System.out.println(searchLink);
+        }
+
+        // 키워드와 링크를 매칭하여 resourceList에 추가
+        int size = Math.min(keywordList.size(), linksList.size());
+        for (int i = 0; i < size; i++) {
+            String keyword = keywordList.get(i);
+            String link = linksList.get(i);
+
+            Reference reference = new Reference(keyword, link, "", "", "", "");
+            references.add(reference);
+        }
+        SearchReference(references);
+
+//        quitDriver();
+        return references;
+    }
+
+    private void SearchReference(List<Reference> references) {
+        for (Reference reference : references) {
+            String documentTitle = reference.getKeywords();
+            // Google 뉴스 검색 URL 생성
+            String naverSearchUrl = null;
+            try {
+                naverSearchUrl = "https://search.naver.com/search.naver?where=news&query=" + URLEncoder.encode(documentTitle, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+            driver.get(naverSearchUrl);
+
+            // 검색 결과 페이지에서 첫 번째 링크 추출
+            WebElement webElement = driver.findElement(By.cssSelector(".news_contents"));
+
+            String newsTitle = webElement.findElement(By.cssSelector(".news_tit")).getText();
+
+            String newsContent = webElement.findElement(By.cssSelector(".news_dsc")).getText();
+
+            String newsLink = webElement.findElement(By.cssSelector(".news_tit")).getAttribute("href");
+
+            String imageUrl = webElement.findElement(By.cssSelector(".thumb")).getAttribute("src");
+
+            reference.setNewsTitle(newsTitle);
+            reference.setNewsContent(newsContent);
+            reference.setNewsLink(newsLink);
+            reference.setImageUrl(imageUrl);
+        }
+    }
+
+    private void quitDriver() {
+        driver.quit(); // webDriver 종료
+    }
 }
+<<<<<<< HEAD:src/main/java/store/itpick/backend/service/SeleniumService.java
 
 
 
 
+=======
+>>>>>>> parent of 274194d (feat : DTO추가, 데이터베이스 접근하여 keyword, reference 접근):src/main/java/store/itpick/backend/util/Selenium.java
