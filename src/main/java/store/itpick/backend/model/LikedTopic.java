@@ -1,11 +1,17 @@
 package store.itpick.backend.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "liked_topic")
+@Builder
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LikedTopic {
 
     @Id
