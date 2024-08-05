@@ -12,8 +12,12 @@ import store.itpick.backend.common.response.status.ResponseStatus;
 import store.itpick.backend.model.CommunityType;
 import store.itpick.backend.model.PeriodType;
 import store.itpick.backend.dto.rank.RankResponseDTO;
+import store.itpick.backend.common.response.BaseResponse;
+import store.itpick.backend.dto.rank.RankResponseDTO;
 import store.itpick.backend.model.Reference;
 import store.itpick.backend.util.Redis;
+import store.itpick.backend.service.RankService;
+import store.itpick.backend.service.SeleniumService;
 import store.itpick.backend.service.RankService;
 import store.itpick.backend.service.SeleniumService;
 
