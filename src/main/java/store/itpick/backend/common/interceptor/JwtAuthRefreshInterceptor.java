@@ -12,7 +12,7 @@ import store.itpick.backend.common.exception.jwt.bad_request.JwtUnsupportedToken
 import store.itpick.backend.common.exception.jwt.unauthorized.JwtExpiredTokenException;
 import store.itpick.backend.common.exception.jwt.unauthorized.JwtInvalidTokenException;
 import store.itpick.backend.jwt.JwtProvider;
-import store.itpick.backend.service.UserService;
+import store.itpick.backend.service.AuthService;
 
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
 
@@ -23,7 +23,7 @@ public class JwtAuthRefreshInterceptor implements HandlerInterceptor {
 
     private static final String JWT_TOKEN_PREFIX = "Bearer ";
     private final JwtProvider jwtProvider;
-    private final UserService userService;
+    private final AuthService authService;
 
     // 컨트롤러 호출전에 JWT 검증
     @Override
@@ -35,7 +35,7 @@ public class JwtAuthRefreshInterceptor implements HandlerInterceptor {
         String email = jwtProvider.getPrincipal(refreshToken);
         validatePayload(email);
 
-        long userId = userService.getUserIdByEmail(email);
+        long userId = authService.getUserIdByEmail(email);
         request.setAttribute("userId", userId);
         return true;
 

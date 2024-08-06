@@ -1,11 +1,17 @@
 package store.itpick.backend.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "liked_topic")
+@Builder
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LikedTopic {
 
     @Id
@@ -21,6 +27,9 @@ public class LikedTopic {
 
     @Column(name = "update_at")
     private Timestamp updateAt;
+
+    @Column(name = "liked_topic")
+    private String liked_topic;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

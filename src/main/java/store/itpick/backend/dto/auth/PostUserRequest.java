@@ -1,4 +1,4 @@
-package store.itpick.backend.dto.user.user;
+package store.itpick.backend.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

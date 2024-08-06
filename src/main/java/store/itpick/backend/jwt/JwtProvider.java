@@ -15,6 +15,8 @@ import static store.itpick.backend.common.response.status.BaseExceptionResponseS
 @Slf4j
 @Component
 public class JwtProvider {
+    private static final String JWT_TOKEN_PREFIX = "Bearer ";
+
 
     @Value("${secret.jwt-secret-key}")
     private String JWT_SECRET_KEY;
