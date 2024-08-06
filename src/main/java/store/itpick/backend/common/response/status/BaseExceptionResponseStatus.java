@@ -53,11 +53,12 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     UNABLE_TO_SEND_EMAIL(5012,HttpStatus.BAD_REQUEST.value(),"메일을 전송할 수 없습니다."),
     NO_SUCH_ALGORITHM(5009, HttpStatus.BAD_REQUEST.value(), "인증 번호 생성을 위한 알고리즘을 찾을 수 없습니다."),
     AUTH_CODE_IS_NOT_SAME(5010, HttpStatus.BAD_REQUEST.value(), "인증 번호가 일치하지 않습니다."),
-    MEMBER_EXISTS(5011,HttpStatus.BAD_REQUEST.value(), "이미 존재하는 회원입니다.");
+    MEMBER_EXISTS(5011,HttpStatus.BAD_REQUEST.value(), "이미 존재하는 회원입니다."),
 
     /**
      * 6000: Debate 오류
      */
+    INVALID_DEBATE_VALUE(6000, HttpStatus.BAD_REQUEST.value(), "토론 생성 요청에서 잘못된 값이 존재합니다.");
 
 
 
