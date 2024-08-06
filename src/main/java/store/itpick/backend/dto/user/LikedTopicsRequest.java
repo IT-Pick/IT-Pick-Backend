@@ -8,5 +8,5 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class LikedTopicsRequest {
-    private List<Long> likedTopicIdList;
+    private List<String> likedTopicList;
 }

@@ -28,6 +28,9 @@ public class LikedTopic {
     @Column(name = "update_at")
     private Timestamp updateAt;
 
+    @Column(name = "liked_topic")
+    private String liked_topic;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

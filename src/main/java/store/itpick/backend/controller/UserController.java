@@ -53,7 +53,7 @@ public class UserController {
             throw new UserException(INVALID_USER_VALUE, getErrorMessages(bindingResult));
         }
         log.info(String.valueOf(userId));
-        userService.changeLikedTopics(userId, likedTopicsRequest.getLikedTopicIdList());
+        userService.changeLikedTopics(userId, likedTopicsRequest.getLikedTopicList());
         return new BaseResponse<>(null);
     }
 

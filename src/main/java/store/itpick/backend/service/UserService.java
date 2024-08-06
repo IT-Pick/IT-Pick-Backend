@@ -44,13 +44,13 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void changeLikedTopics(long userId, List<Long> likedTopicIdList) {
+    public void changeLikedTopics(long userId, List<String> likedTopicList) {
         User user = getUser(userId, userRepository);
 
         // 기존 LikedTopic 목록을 맵으로 변환
-        Map<Long, LikedTopic> existingLikedTopicsMap = user.getLikedTopics()
+        Map<String, LikedTopic> existingLikedTopicsMap = user.getLikedTopics()
                 .stream()
-                .collect(Collectors.toMap(LikedTopic::getLikedTopicId, likedTopic -> likedTopic));
+                .collect(Collectors.toMap(LikedTopic::getLiked_topic, likedTopic -> likedTopic));
 
         // 모든 기존 LikedTopic의 상태를 Inactive로 설정
         for (LikedTopic likedTopic : existingLikedTopicsMap.values()) {
@@ -59,8 +59,8 @@ public class UserService {
         }
 
         // 새로운 likedTopicIdList를 기준으로 LikedTopic을 업데이트
-        for (Long likedTopicId : likedTopicIdList) {
-            LikedTopic likedTopic = existingLikedTopicsMap.get(likedTopicId);
+        for (String sendlikedTopic : likedTopicList) {
+            LikedTopic likedTopic = existingLikedTopicsMap.get(sendlikedTopic);
             if (likedTopic != null) {
                 // 기존에 있는 likedTopic의 상태를 Active로 변경
                 likedTopic.setStatus("Active");
@@ -69,10 +69,10 @@ public class UserService {
             } else {
                 // 새로운 likedTopic을 생성하여 추가
                 LikedTopic newLikedTopic = LikedTopic.builder()
-                        .likedTopicId(likedTopicId)
                         .status("Active")
                         .createAt(Timestamp.valueOf(LocalDateTime.now()))
                         .user(user)
+                        .liked_topic(sendlikedTopic)
                         .build();
                 user.getLikedTopics().add(newLikedTopic);
                 likedTopicRepository.save(newLikedTopic);
