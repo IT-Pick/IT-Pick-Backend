@@ -162,6 +162,6 @@ spring:
     activate:
       on-profile: "web-driver"
 
-web-driver:
+webdriver:
   path: ${WEB_DRIVER_PATH}
 
