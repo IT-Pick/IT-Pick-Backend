@@ -47,7 +47,7 @@ public class User {
     private String status;
 
     @Column(name = "create_at", nullable = false)
-    private java.sql.Timestamp createAt;
+    private Timestamp createAt;
 
     @Column(name = "update_at")
     private Timestamp updateAt;

@@ -19,7 +19,7 @@ import store.itpick.backend.dto.user.user.PostUserResponse;
 import store.itpick.backend.service.UserService;
 import store.itpick.backend.common.exception.UserException;
 
-import  static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_USER_VALUE;
+import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_USER_VALUE;
 import static store.itpick.backend.util.BindingResultUtils.getErrorMessages;
 
 @Slf4j
