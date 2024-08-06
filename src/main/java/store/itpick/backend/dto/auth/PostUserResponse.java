@@ -1,4 +1,4 @@
-package store.itpick.backend.dto.user.user;
+package store.itpick.backend.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

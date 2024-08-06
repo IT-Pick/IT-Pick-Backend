@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import store.itpick.backend.service.UserService;
+import store.itpick.backend.service.AuthService;
 
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
 
@@ -24,7 +24,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
     private static final String JWT_TOKEN_PREFIX = "Bearer ";
     private final JwtProvider jwtProvider;
-    private final UserService userService;
+    private final AuthService authService;
 
     // 컨트롤러 호출전에 JWT 검증
     @Override
@@ -36,7 +36,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
         String email = jwtProvider.getPrincipal(accessToken);
         validatePayload(email);
 
-        long userId = userService.getUserIdByEmail(email);
+        long userId = authService.getUserIdByEmail(email);
         request.setAttribute("userId", userId);
         return true;
 
