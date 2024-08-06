@@ -29,6 +29,7 @@ public class DebateService {
                 .status("active")
                 .createAt(Timestamp.valueOf(LocalDateTime.now()))
                 .updateAt(Timestamp.valueOf(LocalDateTime.now()))
+                .voteNum(0L)
                 .build();
 
         debate = debateRepository.save(debate);

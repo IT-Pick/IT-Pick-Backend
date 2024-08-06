@@ -39,4 +39,7 @@ public class Debate {
 
     @Column(name = "update_at")
     private Timestamp updateAt;
+
+    @Column(name = "vote_num", nullable = false)
+    private Long voteNum;
 }
