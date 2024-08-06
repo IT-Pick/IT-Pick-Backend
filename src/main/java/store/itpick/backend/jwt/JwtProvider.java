@@ -15,12 +15,17 @@ import static store.itpick.backend.common.response.status.BaseExceptionResponseS
 @Slf4j
 @Component
 public class JwtProvider {
+    private static final String JWT_TOKEN_PREFIX = "Bearer ";
+
 
     @Value("${secret.jwt-secret-key}")
     private String JWT_SECRET_KEY;
 
     @Value("${secret.jwt-expired-in}")
     private long JWT_EXPIRED_IN;
+
+    @Value("${secret.jwt-refresh-expired-in}")
+    private long JWT_REFRESH_EXPIRED_IN;
 
     public String createToken(String principal, long userId) {
         log.info("JWT key={}", JWT_SECRET_KEY);
@@ -38,16 +43,31 @@ public class JwtProvider {
                 .compact();
     }
 
+    public String createRefreshToken(String principal, long userId) {
+        log.info("JWT key={}", JWT_SECRET_KEY);
+
+        Claims claims = Jwts.claims().setSubject(principal);
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + JWT_REFRESH_EXPIRED_IN);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .claim("userId", userId)
+                .signWith(SignatureAlgorithm.HS256, JWT_SECRET_KEY)
+                .compact();
+    }
+
     public boolean isExpiredToken(String token) throws JwtInvalidTokenException {
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(JWT_SECRET_KEY).build()
-                    .parseClaimsJws(token);
+                    .parseClaimsJws(token); // 유효성 확인
             return claims.getBody().getExpiration().before(new Date());
 
         } catch (ExpiredJwtException e) {
             return true;
-
         } catch (UnsupportedJwtException e) {
             throw new JwtUnsupportedTokenException(UNSUPPORTED_TOKEN_TYPE);
         } catch (MalformedJwtException e) {
@@ -65,5 +85,14 @@ public class JwtProvider {
                 .setSigningKey(JWT_SECRET_KEY).build()
                 .parseClaimsJws(token)
                 .getBody().getSubject();
+    }
+
+    public Long getUserIdFromToken(String token){
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(JWT_SECRET_KEY).build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("userId", Long.class);
     }
 }
