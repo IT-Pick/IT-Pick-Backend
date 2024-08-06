@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import store.itpick.backend.common.exception.VoteException;
+import store.itpick.backend.dto.debate.VoteOptionRequest;
 import store.itpick.backend.dto.vote.PostVoteRequest;
 import store.itpick.backend.dto.vote.PostVoteResponse;
 import store.itpick.backend.model.Debate;
@@ -16,6 +17,7 @@ import store.itpick.backend.repository.VoteOptionRepository;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_DEBATE_ID;
@@ -30,7 +32,7 @@ public class VoteService {
     private final VoteOptionRepository voteOptionRepository;
 
     @Transactional
-    public PostVoteResponse createVote(PostVoteRequest postVoteRequest) {
+    public PostVoteResponse createVote(PostVoteRequest postVoteRequest, List<VoteOptionRequest> voteOptions) {
         Debate debate = debateRepository.findById(postVoteRequest.getDebateId())
                 .orElseThrow(() -> new VoteException(INVALID_DEBATE_ID));
 
@@ -43,18 +45,19 @@ public class VoteService {
 
         vote = voteRepository.save(vote);
 
-        if (postVoteRequest.getOptionNum() > 0) {
-            createVoteOptions(vote, postVoteRequest.getOptionNum());
+        if (voteOptions != null && !voteOptions.isEmpty()) {
+            createVoteOptions(vote, voteOptions);
         }
 
         return new PostVoteResponse(vote.getVoteId());
     }
 
     @Transactional
-    public void createVoteOptions(Vote vote, Long optionNum) {
-        for (long i = 0; i < optionNum; i++) {
+    public void createVoteOptions(Vote vote, List<VoteOptionRequest> voteOptions) {
+        for (VoteOptionRequest option : voteOptions) {
             VoteOption voteOption = VoteOption.builder()
-                    .optionText("Option " + (i + 1))  // 실제 옵션 텍스트로 변경 필요
+                    .optionText(option.getOptionText())
+                    .imgUrl(option.getImgUrl())
                     .status("active")
                     .createAt(Timestamp.valueOf(LocalDateTime.now()))
                     .updateAt(Timestamp.valueOf(LocalDateTime.now()))

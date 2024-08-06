@@ -5,15 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostDebateRequest {
-    private String title;
-    private String content;
-    private List<VoteOptionRequest> voteOptions;
+public class VoteOptionRequest {
+    private String optionText;
+    private String imgUrl;
 }
-
