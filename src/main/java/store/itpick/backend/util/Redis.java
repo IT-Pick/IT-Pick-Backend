@@ -38,7 +38,15 @@ public class Redis {
         ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
         String key = makeKey(communityType, periodType, "not needed");
 
-//        for (int rank = 1; rank <= 10; rank++) {
+//        List<String> originalKeywordList = new ArrayList<>();
+//        for (Object originalKeyword : Objects.requireNonNull(zSetOperations.reverseRange(key, 0, 9))) {
+//            originalKeywordList.add((String) originalKeyword);
+//        }
+
+        if (keywordList.size() >= 10) {
+            redisTemplate.delete(key);
+        }
+
         for (int i = 0; i < 10; i++) {
             int score = 10 - i;
             System.out.printf("key: %s\tscore: %d\tkeyword: %s\n", key, score, keywordList.get(i));
