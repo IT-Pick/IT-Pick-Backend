@@ -58,7 +58,7 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     /**
      * 6000: Debate 오류
      */
-    INVALID_DEBATE_VALUE(6000, HttpStatus.BAD_REQUEST.value(), "토론 생성 요청에서 잘못된 값이 존재합니다.");
+    INVALID_DEBATE_VALUE(6000, HttpStatus.BAD_REQUEST.value(), "토론 생성 요청에서 잘못된 값이 존재합니다."),
 
 
 
@@ -66,6 +66,8 @@ public enum BaseExceptionResponseStatus implements ResponseStatus {
     /**
      * 7000: Vote 오류
      */
+
+    INVALID_DEBATE_ID(7000,HttpStatus.BAD_REQUEST.value(), "유효하지 않은 DEBATE ID입니다.");
 
 
 

@@ -42,4 +42,7 @@ public class Debate {
 
     @Column(name = "vote_num", nullable = false)
     private Long voteNum;
+
+    @OneToOne(mappedBy = "debate", cascade = CascadeType.ALL)
+    private Vote vote;
 }

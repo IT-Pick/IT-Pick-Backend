@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import store.itpick.backend.dto.debate.PostDebateRequest;
 import store.itpick.backend.dto.debate.PostDebateResponse;
+import store.itpick.backend.dto.vote.PostVoteRequest;
 import store.itpick.backend.model.Debate;
 import store.itpick.backend.repository.DebateRepository;
 
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 public class DebateService {
 
     private final DebateRepository debateRepository;
+    private final VoteService voteService;
 
     @Transactional
     public PostDebateResponse createDebate(PostDebateRequest postDebateRequest) {
@@ -29,10 +31,17 @@ public class DebateService {
                 .status("active")
                 .createAt(Timestamp.valueOf(LocalDateTime.now()))
                 .updateAt(Timestamp.valueOf(LocalDateTime.now()))
-                .voteNum(0L)
+                .voteNum(postDebateRequest.getVoteNum())
                 .build();
 
         debate = debateRepository.save(debate);
+
+        if (postDebateRequest.getVoteNum() > 0) {
+            PostVoteRequest postVoteRequest = new PostVoteRequest();
+            postVoteRequest.setDebateId(debate.getDebateId());
+            postVoteRequest.setOptionNum(postDebateRequest.getVoteNum());
+            voteService.createVote(postVoteRequest);
+        }
 
         return new PostDebateResponse(debate.getDebateId());
     }
