@@ -2,6 +2,8 @@ package store.itpick.backend.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import store.itpick.backend.model.Keyword;
@@ -43,20 +45,88 @@ public class KeywordService {
     }
 
     @Transactional
-    public void performDailyTasks() {
+    public void performDailyTasksNate() {
         log.info("Starting scheduled tasks...performing DailyTask");
 
+        Pageable pageable = PageRequest.of(0, 10);  // 페이지 0, 크기 10
+
+
         // 현재 날짜를 yyyy_MM_dd 형식으로 포맷
-        String currentDate = Instant.now().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy_MM_dd"));
+        String currentDate = Instant.now().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yy_MM_dd"));
 
         // redis_id가 'nate_by_real_time'인 레코드 중에서 최신 10개를 조회
-        List<Keyword> recentKeywords = keywordRepository.findTop10ByRedisIdOrderByUpdateAtDesc();
-
+        List<Keyword> recentKeywords = keywordRepository.findTop10ByRedisIdForNate(pageable);
+        int i=1;
         // 기존 레코드의 redis_id를 현재 날짜로 설정하여 새로운 레코드를 생성
         for (Keyword keyword : recentKeywords) {
+            System.out.println(i++);
             Keyword newKeyword = new Keyword();
             newKeyword.setKeyword(keyword.getKeyword()); // 기존 키워드를 복사
             newKeyword.setRedisId("nate_" + currentDate); // 새로운 redis_id 설정
+            newKeyword.setStatus("active"); // 기본값 설정
+            newKeyword.setCreateAt(Timestamp.from(Instant.now())); // 현재 시각으로 생성
+            newKeyword.setUpdateAt(Timestamp.from(Instant.now())); // 현재 시각으로 업데이트
+
+            // 기존의 reference를 그대로 유지
+            newKeyword.setReference(keyword.getReference());
+
+            // 새로운 키워드 저장
+            keywordRepository.save(newKeyword);
+        }
+
+        log.info("Scheduled tasks completed DailyTask.");
+    }
+    @Transactional
+    public void performDailyTasksNaver() {
+        log.info("Starting scheduled tasks...performing DailyTask");
+
+        Pageable pageable = PageRequest.of(0, 10);  // 페이지 0, 크기 10
+
+
+        // 현재 날짜를 yyyy_MM_dd 형식으로 포맷
+        String currentDate = Instant.now().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yy_MM_dd"));
+
+        // redis_id가 'nate_by_real_time'인 레코드 중에서 최신 10개를 조회
+        List<Keyword> recentKeywords = keywordRepository.findTop10ByRedisIdForNaver(pageable);
+        int i=1;
+        // 기존 레코드의 redis_id를 현재 날짜로 설정하여 새로운 레코드를 생성
+        for (Keyword keyword : recentKeywords) {
+            System.out.println(i++);
+            Keyword newKeyword = new Keyword();
+            newKeyword.setKeyword(keyword.getKeyword()); // 기존 키워드를 복사
+            newKeyword.setRedisId("naver_" + currentDate); // 새로운 redis_id 설정
+            newKeyword.setStatus("active"); // 기본값 설정
+            newKeyword.setCreateAt(Timestamp.from(Instant.now())); // 현재 시각으로 생성
+            newKeyword.setUpdateAt(Timestamp.from(Instant.now())); // 현재 시각으로 업데이트
+
+            // 기존의 reference를 그대로 유지
+            newKeyword.setReference(keyword.getReference());
+
+            // 새로운 키워드 저장
+            keywordRepository.save(newKeyword);
+        }
+
+        log.info("Scheduled tasks completed DailyTask.");
+    }
+    @Transactional
+    public void performDailyTasksZum() {
+        log.info("Starting scheduled tasks...performing DailyTask");
+
+        Pageable pageable = PageRequest.of(0, 10);  // 페이지 0, 크기 10
+
+
+        // 현재 날짜를 yyyy_MM_dd 형식으로 포맷
+        String currentDate = Instant.now().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yy_MM_dd"));
+
+        // redis_id가 'nate_by_real_time'인 레코드 중에서 최신 10개를 조회
+        List<Keyword> recentKeywords = keywordRepository.findTop10ByRedisIdForZum(pageable);
+        int i=1;
+        // 기존 레코드의 redis_id를 현재 날짜로 설정하여 새로운 레코드를 생성
+        for (Keyword keyword : recentKeywords) {
+            System.out.println(i++);
+            Keyword newKeyword = new Keyword();
+            newKeyword.setKeyword(keyword.getKeyword()); // 기존 키워드를 복사
+            newKeyword.setRedisId("zum_" + currentDate); // 새로운 redis_id 설정
             newKeyword.setStatus("active"); // 기본값 설정
             newKeyword.setCreateAt(Timestamp.from(Instant.now())); // 현재 시각으로 생성
             newKeyword.setUpdateAt(Timestamp.from(Instant.now())); // 현재 시각으로 업데이트

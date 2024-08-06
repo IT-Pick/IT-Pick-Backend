@@ -54,7 +54,7 @@ public class SchedulerService {
 
 
     // 매 시간마다 실행하는 작업
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 47 * * * *")
     public void performScheduledTasks() {
         log.info("Starting scheduled tasks...");
         if (isDailyTaskTime()) {
@@ -73,7 +73,7 @@ public class SchedulerService {
     // 시간별 크롤링 작업
     private void performHourlyTasks() {
         try {
-            executeWithRetries(() -> seleniumService.useDriverForZum("https://zum.com/"), "Zum 데이터 수집");
+//            executeWithRetries(() -> seleniumService.useDriverForZum("https://zum.com/"), "Zum 데이터 수집");
             executeWithRetries(() -> seleniumService.useDriverForMnate("https://m.nate.com/"), "Mnate 데이터 수집");
             executeWithRetries(() -> seleniumService.useDriverForNaver("https://www.signal.bz/"), "Naver 데이터 수집");
         } catch (Exception e) {
@@ -88,7 +88,9 @@ public class SchedulerService {
         log.info("Starting scheduled tasks...performing DailyTask");
         performHourlyTasks(); // 매일 18시에 hourlyTask를 포함
         // Daily task 로직
-        keywordService.performDailyTasks();
+        keywordService.performDailyTasksNate();
+        keywordService.performDailyTasksNaver();
+//        keywordService.performDailyTasksZum();
         log.info("Scheduled tasks completed DailyTask.");
 
     }
