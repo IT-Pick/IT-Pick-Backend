@@ -268,27 +268,21 @@ public class SeleniumService {
 
     @Transactional
     public void processKeywordsAndReferences(String communityName, List<String> keywordList, List<String> linksList) {
-        List<Keyword> keywordsToSave = new ArrayList<>();
+        List<Keyword> keywords = new ArrayList<>();
         List<Keyword> keywordsToUpdate = new ArrayList<>();
+        List<Keyword> keywordsToSave = new ArrayList<>();
         int size = Math.min(keywordList.size(), linksList.size());
 
-        // 1. 키워드 존재 여부에 따라 구분
+
         for (int i = 0; i < size; i++) {
             String keywordContent = keywordList.get(i);
-            Optional<Keyword> existingKeywordOptional = keywordService.findByKeyword(keywordContent);
-
-            if (existingKeywordOptional.isPresent()) {
-                Keyword existingKeyword = existingKeywordOptional.get();
-                keywordsToUpdate.add(existingKeyword); // 기존 키워드를 업데이트 대상으로 추가
-            } else {
-                Keyword keyword = new Keyword();
-                keyword.setKeyword(keywordContent);
-                keywordsToSave.add(keyword); // 새로운 키워드를 저장 대상으로 추가
-            }
+            Keyword keyword = new Keyword();
+            keyword.setKeyword(keywordContent);
+            keywords.add(keyword);
         }
 
         // 2. Reference 객체 검색
-        List<Reference> references = SearchReference(keywordsToSave, linksList);
+        List<Reference> references = SearchReference(keywords, linksList);
 
         // 3. Reference 객체 저장 (새로 추가되는 경우)
         referenceService.saveAll(references);
@@ -310,26 +304,44 @@ public class SeleniumService {
             throw new RuntimeException("CommunityPeriod 저장 중 오류가 발생했습니다.", e);
         }
 
-        // 5. 키워드에 참조 설정 및 기존 키워드 업데이트
-        for (int i = 0; i < keywordsToSave.size(); i++) {
-            Keyword keyword = keywordsToSave.get(i);
+        // 1. 키워드 존재 여부에 따라 구분
+        for (int i = 0; i < size; i++) {
             Reference reference = references.get(i);
-            keyword.setReference(reference);
-            keyword.getCommunityPeriods().add(communityPeriod); // CommunityPeriod 추가
-        }
 
-        for (Keyword keyword : keywordsToUpdate) {
-            // Reference는 검색하여 업데이트
-            Optional<Reference> newReferenceOptional = references.stream()
-                    .filter(ref -> ref.getSearchLink().equals(keyword.getReference().getSearchLink())) // 예시: 적절한 기준으로 필터링
-                    .findFirst();
 
-            if (newReferenceOptional.isPresent()) {
-                Reference newReference = newReferenceOptional.get();
-                keyword.setReference(newReference);
-                keyword.setUpdateAt(Timestamp.from(Instant.now())); // updateAt 필드 업데이트
+            String keywordContent = keywordList.get(i);
+            Optional<Keyword> existingKeywordOptional = keywordService.findByKeyword(keywordContent);
+
+
+            if (existingKeywordOptional.isPresent()) {
+                //중복되는 키워드가 있는 경우 reference 만 업데이트 해줌
+                Keyword existingKeyword = existingKeywordOptional.get();
+                existingKeyword.setReference(reference);
+                keywordsToUpdate.add(existingKeyword); // 기존 키워드를 업데이트 대상으로 추가
+            } else {
+                //중복되는 키워드가 없는 경우
+                Keyword keyword= new Keyword();
+                keyword.setKeyword(keywordContent);
+                keyword.setReference(reference);
+                keyword.getCommunityPeriods().add(communityPeriod); // CommunityPeriod 추가
+                keywordsToSave.add(keyword); // 새로운 키워드를 저장 대상으로 추가
             }
         }
+
+
+
+
+
+
+
+////        // 5. 키워드에 참조 설정 및 기존 키워드 업데이트
+//        for (int i = 0; i < keywordsToSave.size(); i++) {
+//            Keyword keyword = keywordsToSave.get(i);
+//            Reference reference = references.get(i);
+//            keyword.setReference(reference);
+//            keyword.getCommunityPeriods().add(communityPeriod); // CommunityPeriod 추가
+//        }
+
 
         try {
             // 모든 키워드와 커뮤니티 기간 저장
