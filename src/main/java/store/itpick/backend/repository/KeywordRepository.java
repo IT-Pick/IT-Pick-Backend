@@ -12,7 +12,10 @@ import java.util.Optional;
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 
     Optional<Keyword> findByKeyword(String keyword);
+    List<Keyword> findByCommunityPeriods(CommunityPeriod communityPeriod);
 
 
+    @Query("SELECT k FROM Keyword k ORDER BY k.updateAt DESC")
+    List<Keyword> findTop10ByOrderByUpdateAtDesc(Pageable pageable);
 
 }

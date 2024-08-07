@@ -17,6 +17,8 @@ public class CommunityPeriodService {
         return communityPeriodRepository.save(communityPeriod);
     }
 
+
+
     public List<CommunityPeriod> saveAll(List<CommunityPeriod> communityPeriods) {
         return communityPeriodRepository.saveAll(communityPeriods);
     }

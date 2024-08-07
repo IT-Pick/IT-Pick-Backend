@@ -23,6 +23,8 @@ import store.itpick.backend.service.KeywordService;
 import store.itpick.backend.service.CommunityPeriodService;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import store.itpick.backend.util.Redis;
 import store.itpick.backend.util.SeleniumUtil;
@@ -264,34 +266,34 @@ public class SeleniumService {
         return references;
     }
 
-    // 키워드 및 참조를 처리하는 공통 메서드
     @Transactional
     public void processKeywordsAndReferences(String communityName, List<String> keywordList, List<String> linksList) {
         List<Keyword> keywordsToSave = new ArrayList<>();
-        List<Keyword> existingKeywordsToUpdate = new ArrayList<>();
+        List<Keyword> keywordsToUpdate = new ArrayList<>();
         int size = Math.min(keywordList.size(), linksList.size());
 
+        // 1. 키워드 존재 여부에 따라 구분
         for (int i = 0; i < size; i++) {
             String keywordContent = keywordList.get(i);
             Optional<Keyword> existingKeywordOptional = keywordService.findByKeyword(keywordContent);
 
             if (existingKeywordOptional.isPresent()) {
                 Keyword existingKeyword = existingKeywordOptional.get();
-                existingKeywordsToUpdate.add(existingKeyword);
+                keywordsToUpdate.add(existingKeyword); // 기존 키워드를 업데이트 대상으로 추가
             } else {
                 Keyword keyword = new Keyword();
                 keyword.setKeyword(keywordContent);
-                keywordsToSave.add(keyword);
+                keywordsToSave.add(keyword); // 새로운 키워드를 저장 대상으로 추가
             }
         }
 
-        // Reference 객체 검색
+        // 2. Reference 객체 검색
         List<Reference> references = SearchReference(keywordsToSave, linksList);
 
-        // Reference 객체 저장
+        // 3. Reference 객체 저장 (새로 추가되는 경우)
         referenceService.saveAll(references);
 
-        // CommunityPeriod 객체 생성 및 저장
+        // 4. CommunityPeriod 객체 생성 및 저장
         CommunityPeriod communityPeriod = new CommunityPeriod();
         communityPeriod.setCommunity(communityName);
         communityPeriod.setPeriod("realtime");
@@ -308,18 +310,32 @@ public class SeleniumService {
             throw new RuntimeException("CommunityPeriod 저장 중 오류가 발생했습니다.", e);
         }
 
-        // 키워드에 참조 설정
+        // 5. 키워드에 참조 설정 및 기존 키워드 업데이트
         for (int i = 0; i < keywordsToSave.size(); i++) {
             Keyword keyword = keywordsToSave.get(i);
             Reference reference = references.get(i);
             keyword.setReference(reference);
+            keyword.getCommunityPeriods().add(communityPeriod); // CommunityPeriod 추가
+        }
+
+        for (Keyword keyword : keywordsToUpdate) {
+            // Reference는 검색하여 업데이트
+            Optional<Reference> newReferenceOptional = references.stream()
+                    .filter(ref -> ref.getSearchLink().equals(keyword.getReference().getSearchLink())) // 예시: 적절한 기준으로 필터링
+                    .findFirst();
+
+            if (newReferenceOptional.isPresent()) {
+                Reference newReference = newReferenceOptional.get();
+                keyword.setReference(newReference);
+                keyword.setUpdateAt(Timestamp.from(Instant.now())); // updateAt 필드 업데이트
+            }
         }
 
         try {
             // 모든 키워드와 커뮤니티 기간 저장
-            keywordService.saveAll(keywordsToSave);
-            for (Keyword keyword : existingKeywordsToUpdate) {
-                keywordService.save(keyword); // 엔티티 저장 시 onUpdate 메서드가 호출됨
+            keywordService.saveAll(keywordsToSave); // 새로운 키워드 저장
+            for (Keyword keyword : keywordsToUpdate) {
+                keywordService.save(keyword); // 기존 키워드 업데이트
             }
             communityPeriodService.save(communityPeriod);
         } catch (DataIntegrityViolationException e) {
@@ -327,6 +343,7 @@ public class SeleniumService {
             throw new RuntimeException("중복된 키워드가 존재합니다.", e);
         }
     }
+
 
 
 
