@@ -111,7 +111,11 @@ public class RankController {
     @GetMapping("/update/naver")
     public void getUpdate(){
         keywordService.performDailyTasksNaver();
+    }
 
+    @GetMapping("/update/nate")
+    public void updateNate(){
+        keywordService.performDailyTasksNate();
     }
 
     @GetMapping("/naver")

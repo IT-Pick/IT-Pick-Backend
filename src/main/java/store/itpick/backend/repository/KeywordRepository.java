@@ -15,7 +15,13 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
     List<Keyword> findByCommunityPeriods(CommunityPeriod communityPeriod);
 
 
-    @Query("SELECT k FROM Keyword k ORDER BY k.updateAt DESC")
-    List<Keyword> findTop10ByOrderByUpdateAtDesc(Pageable pageable);
+    @Query("SELECT k FROM Keyword k JOIN k.communityPeriods cp WHERE cp.community = 'naver' ORDER BY k.updateAt DESC")
+    List<Keyword> findTop10ByCommunityNaver(Pageable pageable);
+
+    @Query("SELECT k FROM Keyword k JOIN k.communityPeriods cp WHERE cp.community = 'nate' ORDER BY k.updateAt DESC")
+    List<Keyword> findTop10ByCommunityNate(Pageable pageable);
+
+    @Query("SELECT k FROM Keyword k JOIN k.communityPeriods cp WHERE cp.community = 'zum' ORDER BY k.updateAt DESC")
+    List<Keyword> findTop10ByCommunityZum(Pageable pageable);
 
 }

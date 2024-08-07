@@ -99,8 +99,6 @@ public class SeleniumService {
             keywordList.add(keyword);
             System.out.println(keyword);
         }
-        String redisKey = redis.saveRealtime(CommunityType.ZUM, PeriodType.BY_REAL_TIME, keywordList);
-
 
         // 링크 수집
         List<WebElement> webElementBySearchLink = issueLayer.findElements(By.cssSelector(".link"));
@@ -114,7 +112,6 @@ public class SeleniumService {
         processKeywordsAndReferences("zum", keywordList, linksList);
 
 
-//        quitDriver();
         return null;
     }
 
@@ -143,15 +140,10 @@ public class SeleniumService {
             keywordList.add(keyword);   //키워드 추가
             linksList.add(searchLink);  //링크 추가
 
-//            Reference reference = new Reference(keyword, searchLink, "", "", "", "");
-//            references.add(reference);
         }
-        String redisKey = redis.saveRealtime(CommunityType.NAVER, PeriodType.BY_REAL_TIME, keywordList);
 
         processKeywordsAndReferences("naver", keywordList, linksList);
 
-
-//        quitDriver();
         return null;
     }
 
@@ -192,7 +184,6 @@ public class SeleniumService {
             keywordList.add(keyword);
             System.out.println(keyword);
         }
-        String redisKey = redis.saveRealtime(CommunityType.NATE, PeriodType.BY_REAL_TIME, keywordList);
 
 
         // 링크 수집
@@ -204,10 +195,8 @@ public class SeleniumService {
             System.out.println(searchLink);
         }
 
-        processKeywordsAndReferences("zum", keywordList, linksList);
+        processKeywordsAndReferences("nate", keywordList, linksList);
 
-
-//        quitDriver();
         return null;
     }
 
