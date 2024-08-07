@@ -18,7 +18,9 @@ import store.itpick.backend.dto.auth.RefreshResponse;
 import store.itpick.backend.dto.auth.PostUserRequest;
 import store.itpick.backend.dto.auth.PostUserResponse;
 import store.itpick.backend.jwt.JwtProvider;
+import store.itpick.backend.model.LikedTopic;
 import store.itpick.backend.model.User;
+import store.itpick.backend.repository.LikedTopicRepository;
 import store.itpick.backend.repository.UserRepository;
 
 
@@ -46,6 +48,7 @@ public class AuthService {
     private final JwtProvider jwtTokenProvider;
     private final MailService mailService;
     private final RedisService redisService;
+    private final LikedTopicRepository likedTopicRepository;
 
     @Value("${spring.mail.auth-code-expiration-millis}")
     private long authCodeExpirationMillis;
@@ -106,6 +109,18 @@ public class AuthService {
         User user = User.builder().email(postUserRequest.getEmail()).password(encodedPassword).nickname(postUserRequest.getNickname()).birthDate(postUserRequest.getBirth_date()).status("active").alertSetting(true).createAt(Timestamp.valueOf(LocalDateTime.now())).build();
 
         user = userRepository.save(user);
+
+        if (postUserRequest.getLikedTopics() != null) {
+            for (String likedTopic : postUserRequest.getLikedTopics()) {
+                LikedTopic newLikedTopic = LikedTopic.builder()
+                        .user(user)
+                        .liked_topic(likedTopic)
+                        .status("active")
+                        .createAt(Timestamp.valueOf(LocalDateTime.now()))
+                        .build();
+                likedTopicRepository.save(newLikedTopic);
+            }
+        }
 
         return new PostUserResponse(user.getUserId());
     }

@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.List;
+
 
 @Data
 @NoArgsConstructor
@@ -37,4 +39,7 @@ public class PostUserRequest {
     @NotBlank(message = "birth_date: 필수입니다.")
     @Length(min = 6, max = 6, message = "birth_date: 정확히 {max}자리여야 합니다")
     private String birth_date;
+
+    private List<String> likedTopics;
+
 }
