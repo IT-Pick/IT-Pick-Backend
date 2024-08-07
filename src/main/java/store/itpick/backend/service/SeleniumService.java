@@ -14,14 +14,16 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
-import store.itpick.backend.model.Keyword;
-import store.itpick.backend.model.CommunityType;
-import store.itpick.backend.model.PeriodType;
-import store.itpick.backend.model.Reference;
+import org.springframework.transaction.annotation.Transactional;
+import store.itpick.backend.model.*;
 import store.itpick.backend.repository.KeywordRepository;
 import store.itpick.backend.service.KeywordService;
-import store.itpick.backend.service.ReferenceService;
+import store.itpick.backend.service.CommunityPeriodService;
+
+import java.sql.Date;
+import java.time.LocalDateTime;
 import store.itpick.backend.util.Redis;
 import store.itpick.backend.util.SeleniumUtil;
 
@@ -30,6 +32,8 @@ import java.net.URLEncoder;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -43,6 +47,8 @@ public class SeleniumService {
 
     private final KeywordService keywordService;
     private final ReferenceService referenceService;
+    private final CommunityPeriodService communityPeriodService;
+
 
 
     // ChromeDriver 연결 (WEB_DRIVER_PATH 값 주입되고 사용해야 하므로 PostConstruct)
@@ -103,7 +109,7 @@ public class SeleniumService {
             System.out.println(searchLink);
         }
 
-        processKeywordsAndReferences(redisKey, keywordList, linksList);
+        processKeywordsAndReferences("zum", keywordList, linksList);
 
 
 //        quitDriver();
@@ -140,7 +146,7 @@ public class SeleniumService {
         }
         String redisKey = redis.saveRealtime(CommunityType.NAVER, PeriodType.BY_REAL_TIME, keywordList);
 
-        processKeywordsAndReferences(redisKey, keywordList, linksList);
+        processKeywordsAndReferences("naver", keywordList, linksList);
 
 
 //        quitDriver();
@@ -196,7 +202,7 @@ public class SeleniumService {
             System.out.println(searchLink);
         }
 
-        processKeywordsAndReferences(redisKey, keywordList, linksList);
+        processKeywordsAndReferences("zum", keywordList, linksList);
 
 
 //        quitDriver();
@@ -259,36 +265,71 @@ public class SeleniumService {
     }
 
     // 키워드 및 참조를 처리하는 공통 메서드
-    private void processKeywordsAndReferences(String redisKey, List<String> keywordList, List<String> linksList) {
-        // Keyword 객체 생성
-        List<Keyword> keywords = new ArrayList<>();
+    @Transactional
+    public void processKeywordsAndReferences(String communityName, List<String> keywordList, List<String> linksList) {
+        List<Keyword> keywordsToSave = new ArrayList<>();
+        List<Keyword> existingKeywordsToUpdate = new ArrayList<>();
         int size = Math.min(keywordList.size(), linksList.size());
+
         for (int i = 0; i < size; i++) {
             String keywordContent = keywordList.get(i);
-            Keyword keyword = new Keyword();
-            keyword.setKeyword(keywordContent);
-            keyword.setRedisId(redisKey); // Redis 키 추가
+            Optional<Keyword> existingKeywordOptional = keywordService.findByKeyword(keywordContent);
 
-            keywords.add(keyword);
+            if (existingKeywordOptional.isPresent()) {
+                Keyword existingKeyword = existingKeywordOptional.get();
+                existingKeywordsToUpdate.add(existingKeyword);
+            } else {
+                Keyword keyword = new Keyword();
+                keyword.setKeyword(keywordContent);
+                keywordsToSave.add(keyword);
+            }
         }
 
         // Reference 객체 검색
-        List<Reference> references = SearchReference(keywords, linksList);
+        List<Reference> references = SearchReference(keywordsToSave, linksList);
 
         // Reference 객체 저장
         referenceService.saveAll(references);
 
+        // CommunityPeriod 객체 생성 및 저장
+        CommunityPeriod communityPeriod = new CommunityPeriod();
+        communityPeriod.setCommunity(communityName);
+        communityPeriod.setPeriod("realtime");
 
-
-        // 키워드에 참조 설정 후 저장
-        for (int i = 0; i < keywords.size(); i++) {
-            Keyword keyword = keywords.get(i);
-            Reference reference = references.get(i);
-            keyword.setReference(reference); // 참조를 키워드에 설정
+        try {
+            Optional<CommunityPeriod> existingCommunityPeriodOptional = communityPeriodService.findByCommunityAndPeriod(communityName, "realtime");
+            if (existingCommunityPeriodOptional.isPresent()) {
+                communityPeriod = existingCommunityPeriodOptional.get();
+            } else {
+                communityPeriodService.save(communityPeriod);
+            }
+        } catch (DataIntegrityViolationException e) {
+            log.error("CommunityPeriod 저장 중 예외 발생: " + e.getMessage());
+            throw new RuntimeException("CommunityPeriod 저장 중 오류가 발생했습니다.", e);
         }
 
-        keywordService.saveAll(keywords);
+        // 키워드에 참조 설정
+        for (int i = 0; i < keywordsToSave.size(); i++) {
+            Keyword keyword = keywordsToSave.get(i);
+            Reference reference = references.get(i);
+            keyword.setReference(reference);
+        }
+
+        try {
+            // 모든 키워드와 커뮤니티 기간 저장
+            keywordService.saveAll(keywordsToSave);
+            for (Keyword keyword : existingKeywordsToUpdate) {
+                keywordService.save(keyword); // 엔티티 저장 시 onUpdate 메서드가 호출됨
+            }
+            communityPeriodService.save(communityPeriod);
+        } catch (DataIntegrityViolationException e) {
+            log.error("중복된 키워드가 존재합니다: " + e.getMessage());
+            throw new RuntimeException("중복된 키워드가 존재합니다.", e);
+        }
     }
+
+
+
 
 
     public void quitDriver() {

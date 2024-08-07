@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "keyword")
@@ -23,8 +25,6 @@ public class Keyword {
     @Column(name = "keyword", nullable = false, length = 50)
     private String keyword;
 
-    @Column(name = "redis_id", nullable = false, length = 100)
-    private String redisId;
 
     @Column(name = "status", nullable = false, length = 20)
     private String status = "active"; // 기본값 'active'
@@ -40,6 +40,14 @@ public class Keyword {
     @ManyToOne
     @JoinColumn(name = "reference_id")  // 외래키 컬럼 이름
     private Reference reference;
+
+    @ManyToMany
+    @JoinTable(
+            name = "keyword_community_period",
+            joinColumns = @JoinColumn(name = "keyword_id"),
+            inverseJoinColumns = @JoinColumn(name = "community_period_id")
+    )
+    private List<CommunityPeriod> communityPeriods = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

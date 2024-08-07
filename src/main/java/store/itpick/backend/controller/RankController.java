@@ -91,8 +91,8 @@ public class RankController {
 
 
     @GetMapping("/reference")
-    public BaseResponse<RankResponseDTO> getRank(@RequestParam String key, @RequestParam String keyword) {
-        RankResponseDTO rankResponse = rankService.getReferenceByKeyword(key, keyword);
+    public BaseResponse<RankResponseDTO> getRank( @RequestParam String keyword) {
+        RankResponseDTO rankResponse = rankService.getReferenceByKeyword( keyword);
         return new BaseResponse<>(rankResponse);
     }
 
