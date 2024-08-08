@@ -208,6 +208,7 @@ public class SeleniumService {
     }
 
     private List<Reference> SearchReference(List<Keyword> keywords, List<String> linksList ) {
+        final String emptyImg="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
         List<Reference> references=new ArrayList<>();
         int i=0;
         for (Keyword keyword : keywords) {
@@ -223,6 +224,9 @@ public class SeleniumService {
             driver.get(naverSearchUrl);
 
             try {
+
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
                 // 검색 결과 페이지에서 첫 번째 링크 추출
                 WebElement webElement = driver.findElement(By.cssSelector(".news_contents"));
 
@@ -232,7 +236,26 @@ public class SeleniumService {
 
                 String newsLink = webElement.findElement(By.cssSelector(".news_tit")).getAttribute("href");
 
-                String imageUrl = webElement.findElement(By.cssSelector(".thumb")).getAttribute("src");
+                String imageUrl = webElement.findElement(By.cssSelector(".thumb")). getAttribute("src");
+
+
+                long startTime = System.currentTimeMillis(); // 시작 시간 기록
+                while (imageUrl.equals(emptyImg)){
+                    log.info("이미지 비어사 재추출중...");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (System.currentTimeMillis() - startTime > 30000) {
+                        log.warn("이미지를 30초 이상 로드하지 못했습니다.");
+                        break;
+                    }
+                    webElement = driver.findElement(By.cssSelector(".news_contents"));
+                    imageUrl = webElement.findElement(By.cssSelector(".thumb")). getAttribute("src");
+                }
+
+
 
                 Reference reference=new Reference();
 
