@@ -226,13 +226,13 @@ public class AuthService {
 
 
 
-    private void validateEmail(String email) {
+    public void validateEmail(String email) {
         if (userRepository.existsByEmailAndStatusIn(email, List.of("active", "dormant"))) {
             throw new UserException(BaseExceptionResponseStatus.DUPLICATE_EMAIL);
         }
     }
 
-    private void validateNickname(String nickname) {
+    public void validateNickname(String nickname) {
         if (userRepository.existsByNicknameAndStatusIn(nickname, List.of("active", "dormant"))) {
             throw new UserException(BaseExceptionResponseStatus.DUPLICATE_NICKNAME);
         }

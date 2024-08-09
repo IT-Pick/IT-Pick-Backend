@@ -67,6 +67,18 @@ public class AuthController {
       return new BaseResponse<>(authService.signUp(postUserRequest));
     }
 
+    @GetMapping("/email/check")
+    public BaseResponse<Object> checkEmailDuplicate(@RequestParam("email") @Valid String email) {
+        authService.validateEmail(email);
+        return new BaseResponse<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/nickname/check")
+    public BaseResponse<Object> checkNicknameDuplicate(@RequestParam("nickname") @Valid String nickname) {
+        authService.validateNickname(nickname);
+        return new BaseResponse<>(HttpStatus.OK);
+    }
+
     @DeleteMapping("")
     public BaseResponse<Object> modifyUserStatus_deleted(@RequestHeader("Authorization") String token) {
         // Authorization 헤더에서 "Bearer " 부분을 제거하고 토큰만 추출
