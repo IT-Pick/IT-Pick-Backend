@@ -71,31 +71,31 @@ public class SeleniumService {
             throw new RuntimeException(e);
         }
 
-        try {
-            WebElement btn = driver.findElement(By.className("btn-layer-close-day"));
-            actions.click(btn).perform();
-        } catch (NoSuchElementException ignored) {
-        }
+//        try {
+//            WebElement btn = driver.findElement(By.className("btn-layer-close-day"));
+//            actions.click(btn).perform();
+//        } catch (NoSuchElementException ignored) {
+//        }
 
         WebElement webElement = new WebDriverWait(driver, Duration.ofSeconds(5))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_wrap")));
+                .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_keywords")));
         actions.moveToElement(webElement).perform();
 
-//        // 묵시적 대기
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-        WebElement issueLayer = new WebDriverWait(driver, Duration.ofSeconds(5))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.className("issue_layer")));
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        WebElement issueLayer = new WebDriverWait(driver, Duration.ofSeconds(2))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.className("layer_issue_keywords")));
 
         // 키워드 수집
-        List<WebElement> webElementByKeyword = issueLayer.findElements(By.className("inner_txt"));
+        List<WebElement> webElementByKeyword = issueLayer.findElements(By.cssSelector("a span"));
+        System.out.println(webElementByKeyword.size());
         List<String> keywordList = new ArrayList<>();
         for (WebElement element : webElementByKeyword) {
             String keyword = element.getText();
-
             keywordList.add(keyword);
             System.out.println(keyword);
         }
@@ -103,7 +103,7 @@ public class SeleniumService {
 
 
         // 링크 수집
-        List<WebElement> webElementBySearchLink = issueLayer.findElements(By.cssSelector(".link"));
+        List<WebElement> webElementBySearchLink = issueLayer.findElements(By.cssSelector("a"));
         List<String> linksList = new ArrayList<>();
         for (WebElement element : webElementBySearchLink) {
             String searchLink = element.getAttribute("href");
