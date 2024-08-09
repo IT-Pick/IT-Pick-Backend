@@ -49,7 +49,7 @@ public class RankController {
 
 
     // 최대 재시도 횟수와 재시도 간격 (초)
-    private static final int MAX_RETRIES = 1;
+    private static final int MAX_RETRIES = 5;
     private static final int RETRY_DELAY_SECONDS = 5;
 
     // 재시도 로직을 포함한 함수
@@ -79,7 +79,7 @@ public class RankController {
 
     @GetMapping("/zum")
     public List<Reference> getRankFromZum() {
-        String url = "https://zum.com/";
+        String url = "https://news.zum.com/";
         return executeWithRetries(() -> seleniumService.useDriverForZum(url), "Zum 데이터 수집");
     }
 
