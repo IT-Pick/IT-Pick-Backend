@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "debate")
@@ -42,4 +43,7 @@ public class Debate {
 
     @OneToOne(mappedBy = "debate", cascade = CascadeType.ALL)
     private Vote vote;
+
+    @OneToMany(mappedBy = "debate")
+    private List<Comment> comment;
 }

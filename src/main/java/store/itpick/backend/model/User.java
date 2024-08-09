@@ -57,4 +57,10 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<TermAgreement> termAgreements;
+
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user")
+    private List<CommentHeart> commentHearts;
 }
