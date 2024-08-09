@@ -37,17 +37,11 @@ public class KeywordService {
         keywordRepository.save(keyword);
     }
 
-    // 모든 키워드를 Set으로 반환하는 메서드
-    public Set<String> findAllKeywordsAsSet() {
-        List<Keyword> keywords = keywordRepository.findAll(); // 모든 키워드 조회
-        return keywords.stream()
-                .map(Keyword::getKeyword) // Keyword 객체에서 키워드 문자열 추출
-                .collect(Collectors.toSet()); // Set으로 변환
-    }
 
     public Optional<Keyword> findByKeyword(String keyword) {
         return keywordRepository.findByKeyword(keyword);
     }
+
 
     @Transactional
     public void performDailyTasksNate() {

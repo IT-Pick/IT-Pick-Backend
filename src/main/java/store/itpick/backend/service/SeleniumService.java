@@ -336,6 +336,7 @@ public class SeleniumService {
                 //중복되는 키워드가 있는 경우 reference 만 업데이트 해줌
                 Keyword existingKeyword = existingKeywordOptional.get();
                 existingKeyword.setReference(reference);
+
                 keywordsToUpdate.add(existingKeyword); // 기존 키워드를 업데이트 대상으로 추가
             } else {
                 //중복되는 키워드가 없는 경우
@@ -374,6 +375,7 @@ public class SeleniumService {
             throw new RuntimeException("중복된 키워드가 존재합니다.", e);
         }
     }
+
 
 
 
