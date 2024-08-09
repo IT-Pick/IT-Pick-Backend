@@ -178,21 +178,13 @@ public class AuthService {
     }
 
     public void sendCodeToEmail(String toEmail) {
-        this.checkDuplicatedEmail(toEmail);
+        this.validateEmail(toEmail);
         String title = "ITPICK 회원가입을 위한 이메일 인증 번호입니다.";
         String authCode = this.createCode();
         mailService.sendEmail(toEmail, title, authCode);
         // 이메일 인증 요청 시 인증 번호 Redis에 저장 ( key = "AuthCode " + Email / value = AuthCode )
         redisService.setValues(AUTH_CODE_PREFIX + toEmail,
                 authCode, Duration.ofMillis(this.authCodeExpirationMillis));
-    }
-
-    private void checkDuplicatedEmail(String email){
-        Optional<User> user = userRepository.getUserByEmail(email);
-        if(user.isPresent()){
-            log.debug("MemberServiceImpl.checkDuplicatedEmail exception occur email: {}", email);
-            throw new UserException(BaseExceptionResponseStatus.MEMBER_EXISTS);
-        }
     }
 
     private String createCode() {
@@ -211,7 +203,7 @@ public class AuthService {
     }
 
     public void verifiedCode(String email, String authCode) {
-        this.checkDuplicatedEmail(email);
+        this.validateEmail(email);
         String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
         boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode);
 
@@ -226,13 +218,13 @@ public class AuthService {
 
 
 
-    private void validateEmail(String email) {
+    public void validateEmail(String email) {
         if (userRepository.existsByEmailAndStatusIn(email, List.of("active", "dormant"))) {
             throw new UserException(BaseExceptionResponseStatus.DUPLICATE_EMAIL);
         }
     }
 
-    private void validateNickname(String nickname) {
+    public void validateNickname(String nickname) {
         if (userRepository.existsByNicknameAndStatusIn(nickname, List.of("active", "dormant"))) {
             throw new UserException(BaseExceptionResponseStatus.DUPLICATE_NICKNAME);
         }

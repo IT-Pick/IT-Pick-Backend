@@ -12,14 +12,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostDebateRequest {
+public class PostCommentRequest {
 
-    @NotBlank(message = "title은 필수입니다.")
-    private String title;
+    @NotBlank(message = "comment는 필수입니다.")
+    private String comment;
 
-    @NotBlank(message = "Debate는 필수입니다.")
-    private String content;
+    private Long parentCommentId;
 
-    private List<VoteOptionRequest> voteOptions;
+    private Long debateId;
+
+    private Long userId;
 }
 
