@@ -3,7 +3,6 @@ package store.itpick.backend.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +23,6 @@ import static store.itpick.backend.util.BindingResultUtils.getErrorMessages;
 @RequestMapping("/debate")
 public class DebateController {
 
-    @Autowired
     private final DebateService debateService;
 
     @PostMapping("")
@@ -33,7 +31,7 @@ public class DebateController {
         if (bindingResult.hasErrors()) {
             throw new DebateException(INVALID_DEBATE_VALUE, getErrorMessages(bindingResult));
         }
+
         return new BaseResponse<>(debateService.createDebate(postDebateRequest));
     }
-
 }

@@ -1,6 +1,7 @@
 package store.itpick.backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -11,7 +12,6 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
 public class Debate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
