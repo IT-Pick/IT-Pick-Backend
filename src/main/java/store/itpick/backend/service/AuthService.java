@@ -7,7 +7,7 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import store.itpick.backend.common.exception.UserException;
+import store.itpick.backend.common.exception.AuthException;
 import store.itpick.backend.common.exception.jwt.unauthorized.JwtExpiredTokenException;
 import store.itpick.backend.common.exception.jwt.unauthorized.JwtInvalidTokenException;
 import store.itpick.backend.common.response.status.BaseExceptionResponseStatus;
@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.Random;
 
 import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.*;
-import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_TOKEN;
 
 
 @Slf4j
@@ -68,7 +67,7 @@ public class AuthService {
         try {
             user = userRepository.getUserByEmail(email).get();
         } catch (NoSuchElementException e) {
-            throw new UserException(EMAIL_NOT_FOUND);
+            throw new AuthException(EMAIL_NOT_FOUND);
         }
         long userId = user.getUserId();
 
@@ -88,7 +87,7 @@ public class AuthService {
     private void validatePassword(String password, long userId) {
         String encodedPassword = userRepository.getUserByUserId(userId).get().getPassword();
         if (!passwordEncoder.matches(password, encodedPassword)) {
-            throw new UserException(PASSWORD_NO_MATCH);
+            throw new AuthException(PASSWORD_NO_MATCH);
         }
     }
 
@@ -141,7 +140,7 @@ public class AuthService {
         try {
             user = userRepository.getUserByEmail(email).get();
         } catch (IncorrectResultSizeDataAccessException e) {
-            throw new UserException(EMAIL_NOT_FOUND);
+            throw new AuthException(EMAIL_NOT_FOUND);
         }
         long userId = user.getUserId();
 
@@ -156,7 +155,7 @@ public class AuthService {
         try {
             user = userRepository.getUserByUserId(userId).get();
         } catch (NoSuchElementException e) {
-            throw new UserException(USER_NOT_FOUND);
+            throw new AuthException(USER_NOT_FOUND);
         }
         user.setRefreshToken(null);
         userRepository.save(user);
@@ -173,7 +172,7 @@ public class AuthService {
             user.setStatus("deleted");
             userRepository.save(user);
         } else {
-            throw new UserException(USER_NOT_FOUND);
+            throw new AuthException(USER_NOT_FOUND);
         }
     }
 
@@ -198,7 +197,7 @@ public class AuthService {
             return builder.toString();
         } catch (NoSuchAlgorithmException e) {
             log.debug("MemberService.createCode() exception occur");
-            throw new UserException(BaseExceptionResponseStatus.NO_SUCH_ALGORITHM);
+            throw new AuthException(BaseExceptionResponseStatus.NO_SUCH_ALGORITHM);
         }
     }
 
@@ -208,7 +207,7 @@ public class AuthService {
         boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode);
 
         if(!authResult){
-            throw new UserException(BaseExceptionResponseStatus.AUTH_CODE_IS_NOT_SAME);
+            throw new AuthException(BaseExceptionResponseStatus.AUTH_CODE_IS_NOT_SAME);
         }
     }
 
@@ -220,13 +219,13 @@ public class AuthService {
 
     public void validateEmail(String email) {
         if (userRepository.existsByEmailAndStatusIn(email, List.of("active", "dormant"))) {
-            throw new UserException(BaseExceptionResponseStatus.DUPLICATE_EMAIL);
+            throw new AuthException(BaseExceptionResponseStatus.DUPLICATE_EMAIL);
         }
     }
 
     public void validateNickname(String nickname) {
         if (userRepository.existsByNicknameAndStatusIn(nickname, List.of("active", "dormant"))) {
-            throw new UserException(BaseExceptionResponseStatus.DUPLICATE_NICKNAME);
+            throw new AuthException(BaseExceptionResponseStatus.DUPLICATE_NICKNAME);
         }
     }
 

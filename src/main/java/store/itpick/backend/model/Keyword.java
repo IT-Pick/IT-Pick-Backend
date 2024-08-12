@@ -22,7 +22,7 @@ public class Keyword {
     @Column(name = "keyword_id")
     private Long keywordId;
 
-    @Column(name = "keyword", nullable = false, length = 50)
+    @Column(name = "keyword", nullable = false, length = 50, unique = true)
     private String keyword;
 
 

@@ -1,12 +1,9 @@
 package store.itpick.backend.service;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import store.itpick.backend.common.exception.UserException;
 import store.itpick.backend.dto.auth.JwtDTO;
 import store.itpick.backend.jwt.JwtProvider;
 import store.itpick.backend.model.LikedTopic;
@@ -19,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.USER_NOT_FOUND;
 import static store.itpick.backend.util.UserUtils.getUser;
 
 @Slf4j
@@ -110,5 +106,20 @@ public class UserService {
         user.setUpdateAt(new Timestamp(System.currentTimeMillis()));
 
         userRepository.save(user);
+    }
+
+    public void changeProfileImg(long userId, String imgUrl) {
+        User user = getUser(userId, userRepository);
+        // Encrypt password
+        user.setImageUrl(imgUrl);
+        user.setUpdateAt(new Timestamp(System.currentTimeMillis()));
+
+        userRepository.save(user);
+    }
+
+
+    public String getProfileImgUrl(long userId) {
+        User user = getUser(userId, userRepository);
+        return user.getImageUrl();
     }
 }

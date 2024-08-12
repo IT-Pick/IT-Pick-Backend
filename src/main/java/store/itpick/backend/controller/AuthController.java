@@ -17,7 +17,7 @@ import store.itpick.backend.dto.auth.RefreshResponse;
 import store.itpick.backend.dto.auth.PostUserRequest;
 import store.itpick.backend.dto.auth.PostUserResponse;
 import store.itpick.backend.service.AuthService;
-import store.itpick.backend.common.exception.UserException;
+import store.itpick.backend.common.exception.AuthException;
 
 import  static store.itpick.backend.common.response.status.BaseExceptionResponseStatus.INVALID_USER_VALUE;
 import static store.itpick.backend.util.BindingResultUtils.getErrorMessages;
@@ -44,7 +44,7 @@ public class AuthController {
     public BaseResponse<LoginResponse> login(@Validated @RequestBody LoginRequest authRequest, BindingResult bindingResult) {
         log.info("[AuthController.login]");
         if (bindingResult.hasErrors()) {
-            throw new UserException(INVALID_USER_VALUE, getErrorMessages(bindingResult));
+            throw new AuthException(INVALID_USER_VALUE, getErrorMessages(bindingResult));
         }
         return new BaseResponse<>(authService.login(authRequest));
     }
@@ -62,7 +62,7 @@ public class AuthController {
     @PostMapping("/signup")
     public BaseResponse<PostUserResponse> signUp(@Valid @RequestBody PostUserRequest postUserRequest, BindingResult bindingResult) {
       if(bindingResult.hasErrors()){
-          throw new UserException(INVALID_USER_VALUE, getErrorMessages(bindingResult));
+          throw new AuthException(INVALID_USER_VALUE, getErrorMessages(bindingResult));
       }
       return new BaseResponse<>(authService.signUp(postUserRequest));
     }

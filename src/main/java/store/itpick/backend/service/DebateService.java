@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import store.itpick.backend.common.exception.DebateException;
-import store.itpick.backend.common.exception.UserException;
+import store.itpick.backend.common.exception.AuthException;
 import store.itpick.backend.dto.debate.*;
 import store.itpick.backend.dto.vote.PostVoteRequest;
 import store.itpick.backend.jwt.JwtProvider;
@@ -71,7 +71,7 @@ public class DebateService {
 
         Optional<User> userOptional = userRepository.findById(postCommentRequest.getUserId());
         if (!userOptional.isPresent()) {
-            throw new UserException(USER_NOT_FOUND);
+            throw new AuthException(USER_NOT_FOUND);
         }
         User user = userOptional.get();
 
@@ -87,7 +87,7 @@ public class DebateService {
 
         Optional<User> userOptional = userRepository.findById(postCommentHeartRequest.getUserId());
         if (!userOptional.isPresent()) {
-            throw new UserException(USER_NOT_FOUND);
+            throw new AuthException(USER_NOT_FOUND);
         }
 
         Optional<Comment> commentOptional = commentRepository.findById(postCommentHeartRequest.getCommentId());
@@ -104,6 +104,7 @@ public class DebateService {
                     .commentHeartId(deletedCommentHeartId)
                     .build();
         } else {
+            // 존재하지 않으면 새로운 CommentHeart 생성 및 저장
             CommentHeart commentHeart = CommentHeart.builder()
                     .user(userOptional.get())
                     .comment(commentOptional.get())

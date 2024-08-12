@@ -1,9 +1,9 @@
 spring:
   profiles:
     group:
-      "local": "localDB, devPort, secret, web-mvc, web-driver"
-      "dev": "devDB, devPort, secret, web-mvc, web-driver"
-      "prod": "prodDB, prodPort, secret, web-mvc, web-driver"
+      "local": "localDB, devPort, secret, web-mvc, web-driver, aws"
+      "dev": "devDB, devPort, secret, web-mvc, web-driver, aws"
+      "prod": "prodDB, prodPort, secret, web-mvc, web-driver, aws"
 
   data:
     redis:
@@ -164,4 +164,21 @@ spring:
 
 web-driver:
   path: ${WEB_DRIVER_PATH}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "aws"
+
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET_NAME}
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      accessKey: ${AWS_S3_BUCKET_ACCESS_KEY}
+      secretKey: ${AWS_S3_BUCKET_SECRET_KEY}
 

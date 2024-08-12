@@ -1,7 +1,6 @@
 package store.itpick.backend.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import store.itpick.backend.common.exception.UserException;
+import store.itpick.backend.common.exception.AuthException;
 import store.itpick.backend.model.User;
 import store.itpick.backend.repository.UserRepository;
 
@@ -14,7 +13,7 @@ public class UserUtils {
         try {
             return userRepository.getUserByUserId(userId).get();
         } catch (NoSuchElementException e) {
-            throw new UserException(USER_NOT_FOUND);
+            throw new AuthException(USER_NOT_FOUND);
         }
     }
 }

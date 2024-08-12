@@ -152,7 +152,6 @@ public class Redis {
             }
             rankByCommunity.add(rank + 1);
         }
-
         return new RankListForKeyword(rankByCommunity.get(0), rankByCommunity.get(1), rankByCommunity.get(2));
     }
 
