@@ -37,7 +37,9 @@
 
 ### Architecture
 
-</br>
+<img width="878" alt="image" src="https://github.com/user-attachments/assets/8dafcdcc-a664-4120-9998-7f61fe8406a6" />
+
+
 
 ### ERD
 ![image](https://github.com/user-attachments/assets/47399f49-6802-45c2-b0fa-cad25adb7da8)
